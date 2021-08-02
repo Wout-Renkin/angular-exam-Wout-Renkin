@@ -1,0 +1,62 @@
+<mat-form-field appearance="standard">
+  <mat-label>Filter</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Wout" #input>
+</mat-form-field>
+<mat-form-field >
+  <mat-label>Filter on user kind</mat-label>
+  <mat-select name="optionFilter" (selectionChange)="applyOptionFilter(selected)" [(value)]="selected">
+    <mat-option value="Users">
+      Users
+    </mat-option>
+    <mat-option value="Employees">
+      Employees
+    </mat-option>
+    <mat-option value="Moderators">
+      Moderators
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<table mat-table [dataSource]="users" class="mat-elevation-z8" >
+
+
+  <ng-container matColumnDef="email" >
+    <th mat-header-cell *matHeaderCellDef> Email </th>
+    <td mat-cell *matCellDef="let user"> {{user.email}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="first name">
+    <th mat-header-cell *matHeaderCellDef> First name </th>
+    <td mat-cell *matCellDef="let user"> {{user.firstName}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="last name">
+    <th mat-header-cell *matHeaderCellDef> Last name </th>
+    <td mat-cell *matCellDef="let user"> {{user.lastName}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="add to company">
+    <th mat-header-cell *matHeaderCellDef >
+      <span *ngIf="selected == 'Employees' || selected == 'Moderators'">Remove</span>
+      <span *ngIf="selected == 'Users'">Add to company</span>
+    </th>
+    <td mat-cell *matCellDef="let user">
+      <button mat-icon-button *ngIf="user.roleId == 1" color="primary" (click)="addUserToCompany(user)" aria-label="Example icon button with a home icon">
+        <mat-icon >add</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" *ngIf="user.roleId > 1" (click)="deleteUserFromCompany(user)">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </td>
+    <ng-container matColumnDef="Moderator" >
+      <th mat-header-cell *matHeaderCellDef [hidden]="hidden"> Moderator </th>
+      <td mat-cell [hidden]="hidden" *matCellDef="let user"><mat-slide-toggle [checked]="user.roleId == 3" (change)="toggleModerator($event, user)"></mat-slide-toggle>
+      </td>
+    </ng-container>
+
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" ></tr>
+
+</table>
+<mat-paginator [length]="userCount" [pageSize]="usersPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)" aria-label="Select page of users"></mat-paginator>

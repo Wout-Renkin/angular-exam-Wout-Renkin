@@ -1,0 +1,76 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false" >
+    <mat-toolbar backgroundColor="primary">Menu</mat-toolbar>
+    <mat-nav-list dense class="test">
+      <a mat-list-item routerLink="/company/home">Home</a>
+    </mat-nav-list>
+    <mat-divider></mat-divider>
+    <div *ngIf="isAuthenticated && user.roleId == 4 && company">
+      <mat-list>
+        <mat-list-item routerLink="/company/admin" routerLinkActive="mat-accent" ><mat-icon matListIcon>admin_panel_settings</mat-icon> <strong>Admin</strong> </mat-list-item>
+      </mat-list>
+      <mat-nav-list dense class="test">
+        <a mat-list-item routerLink="/company/users">Manage users</a>
+        <a mat-list-item routerLink="/company/group">Manage groups</a>
+        <a mat-list-item [routerLink]="['/company/edit', company.id]">Edit company</a>
+      </mat-nav-list>
+    </div>
+
+    <mat-divider></mat-divider>
+    <mat-list>
+      <mat-list-item routerLink="/company/admin" routerLinkActive="mat-accent" ><mat-icon matListIcon>groups</mat-icon><strong> My groups</strong> </mat-list-item>
+    </mat-list>
+    <mat-nav-list dense class="test">
+      <a mat-list-item href="#">Manage users</a>
+      <a mat-list-item href="#">Manage groups</a>
+      <a mat-list-item href="#">Edit company</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary"  [ngStyle]="{'background-color': company ? company.backgroundColor : ''}">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span *ngIf="company">{{company.Name}}</span>
+      <span *ngIf="!company"><img class="img-fluid" src="assets/tree.png" height="50x"></span>
+
+      <span class="fill-space"></span>
+
+      <ul>
+        <li>
+          <a mat-button routerLink="/signup" routerLinkActive="mat-accent" *ngIf="!isAuthenticated">Sign up</a>
+        </li>
+        <li>
+          <a mat-button routerLink="/login" routerLinkActive="mat-accent" *ngIf="!isAuthenticated">Log in</a>
+        </li>
+        <li>
+          <button mat-button [matMenuTriggerFor]="settingsMenu" *ngIf="isAuthenticated">
+            <mat-icon>settings</mat-icon>
+            Settings
+          </button>
+          <mat-menu #settingsMenu="matMenu">
+            <button mat-menu-item (click)="onLogout()" *ngIf="isAuthenticated">
+              <mat-icon>person</mat-icon>
+              Edit profile
+            </button>
+            <button mat-menu-item (click)="onLogout()" *ngIf="isAuthenticated">
+              <mat-icon>logout</mat-icon>
+              Logout
+            </button>
+          </mat-menu>
+        </li>
+      </ul>
+    </mat-toolbar>
+    <div class="main">
+      <ng-content></ng-content>
+    </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

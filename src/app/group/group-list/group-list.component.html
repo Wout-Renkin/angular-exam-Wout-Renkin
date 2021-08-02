@@ -1,0 +1,12 @@
+<mat-nav-list>
+  <div mat-subheader>Groups
+    <span class="spacer"></span>
+    <button mat-raised-button color="primary">Create new group</button>
+  </div>
+  <mat-list-item *ngFor="let group of groups"  [routerLink]="['manage/', group.groupId]">
+     <!-- <a matLine (click)="manageGroup(group.groupId)">{{ group.name }}</a> -->
+     <a matLine>{{ group.name }}</a>
+
+     <mat-divider></mat-divider>
+  </mat-list-item>
+</mat-nav-list>

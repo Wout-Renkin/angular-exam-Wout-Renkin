@@ -1,0 +1,106 @@
+<div>
+  <mat-card class="card form">
+    <mat-card-header>
+        <mat-card-title>Create company</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-spinner *ngIf=""></mat-spinner>
+      <form [formGroup]="form" (submit)="onCreateCompany()" >
+
+        <mat-form-field appearance="outline">
+          <mat-label>Company name</mat-label>
+          <input
+            type="text"
+            matInput placeholder="Thomas More"
+            autocomplete="on"
+            formControlName="name">
+          <mat-icon matSuffix>name</mat-icon>
+          <mat-error *ngIf="form.get('name').invalid">Please enter a valid company name.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>City</mat-label>
+          <input
+            type="text"
+            matInput
+            placeholder="Antwerp"
+            autocomplete="on"
+            formControlName="city">
+          <mat-icon matSuffix>password</mat-icon>
+          <mat-error  *ngIf="form.get('city').invalid">Please enter a valid city.</mat-error>
+        </mat-form-field>
+        <br>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Street</mat-label>
+          <input
+            type="text"
+            matInput
+            placeholder="Hauptstrasse"
+            autocomplete="on"
+            formControlName="street">
+          <mat-icon matSuffix>badge</mat-icon>
+          <mat-error *ngIf="form.get('street').invalid">Please enter a valid street name.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Street number</mat-label>
+          <input
+            type="number"
+            matInput
+            placeholder="4"
+            autocomplete="on"
+            formControlName="streetNumber">
+          <mat-icon matSuffix>badge</mat-icon>
+          <mat-error *ngIf="form.get('streetNumber').invalid">Please enter a valid street number.</mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field appearance="outline">
+          <mat-label>Company description</mat-label>
+          <textarea matInput rows="4" formControlName="description" placeholder="Give a description of the company."></textarea>
+          <mat-error *ngIf="form.get('description').invalid">Please enter a description.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Pick a background color</mat-label >
+          <input
+            matInput
+            [(colorPicker)]="backgroundColor"
+            [style.color]="backgroundColor"
+            placeholder="Click to pick a color"
+            [value]="backgroundColor"
+            formControlName="backgroundColor">
+          <mat-icon matSuffix  [ngStyle]="{'color': backgroundColor}">palette</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Pick a font color</mat-label >
+          <input
+            matInput
+            [(colorPicker)]="color"
+            [style.color]="color"
+            placeholder="Click to pick a color"
+            [value]="color"
+            formControlName="color"
+            >
+          <mat-icon matSuffix  [ngStyle]="{'color': color}">palette</mat-icon>
+        </mat-form-field>
+
+        <div>
+          <button mat-raised-button color="accent" type="button" (click)="filePicker.click()">Pick image</button>
+          <input
+            type="file"
+            #filePicker
+            (change)="onImagePicked($event)">
+        </div>
+        <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && form.get('image').valid">
+          <img [src]="imagePreview" [alt]="form.value.title">
+        </div>
+
+        <br/>
+        <button mat-raised-button color="primary" [disabled]="form.invalid">Save</button>
+      </form>
+    </mat-card-content>
+</mat-card>
+</div>

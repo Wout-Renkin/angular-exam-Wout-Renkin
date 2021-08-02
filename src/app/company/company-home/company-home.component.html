@@ -1,0 +1,15 @@
+<mat-card class="example-card" *ngIf="company">
+  <mat-card-header>
+    <div mat-card-avatar ></div>
+    <mat-card-title [ngStyle]="{'color': company ? company.color : ''}">{{ company.Name }}</mat-card-title>
+  </mat-card-header>
+    <img mat-card-image [src]="company.imagePath">
+  <mat-card-content>
+    <p>
+      {{company.description}}
+    </p>
+    <mat-divider></mat-divider>
+    <br>
+    <p>{{company.Street}}  {{company.streetNumber}}, {{company.City}} </p>
+  </mat-card-content>
+</mat-card>
