@@ -1,5 +1,5 @@
 mat-card {
-  max-width: 60%;
+  max-width: 800px;
   margin: auto;
 }
 
@@ -11,10 +11,11 @@ input[type="file"] {
   visibility: hidden;
 }
 
-.image-preview {
-  height: 100px;
+/* .image-preview {
+  height: 300px;
 }
 
 .image-preview img {
   height: 100%;
-}
+} */
+

@@ -60,7 +60,6 @@ export class UserService {
   }
 
   updateUser(user: User, moderator: boolean = false, removed: boolean = false) {
-    console.log("UPDATING USER API CALL")
 
     const loggedInUser: User = JSON.parse(localStorage.getItem('user'))
     user.companyId = loggedInUser.companyId;

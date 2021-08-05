@@ -1,0 +1,42 @@
+
+<div class="search-results"
+      infinite-scroll
+         [infiniteScrollDistance]="scrollDistance"
+         [infiniteScrollUpDistance]="scrollUpDistance"
+         [infiniteScrollThrottle]="throttle"
+         (scrolled)="onScrollDown()"
+         (scrolledUp)="onScrollUp()"
+         infiniteScrollContainer=".my-sidenav-content"
+         [fromRoot]="true"
+         [scrollWindow]="false">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>chat</mat-icon>
+             Create a post
+          </mat-panel-title>
+          <mat-panel-description>
+            Click to create a post
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <app-edit-post [groupId] = "groupId"></app-edit-post>
+      </mat-expansion-panel>
+      <span *ngFor="let post of posts">
+        <mat-card *ngIf="editPostNumber != post.postId">
+          <mat-card-header color="primary">
+            <mat-card-title>{{post.title}}</mat-card-title>
+            <mat-card-subtitle>Post created by: {{post.user.firstName}} {{post.user.lastName}}</mat-card-subtitle>
+          </mat-card-header>
+          <img *ngIf="post.imagePath != 'null'" mat-card-image [src]="post.imagePath">
+          <mat-card-content>
+            {{post.body}}
+          </mat-card-content>
+          <mat-divider></mat-divider>
+          <mat-card-actions>
+            <button mat-button>LIKE</button>
+            <button mat-button (click)="editMode(post)">EDIT</button>
+          </mat-card-actions>
+        </mat-card>
+        <app-edit-post *ngIf="editPostNumber == post.postId" [postId] = "editPostNumber" (stopEditing)="stopEditing()"></app-edit-post>
+      </span>
+</div>

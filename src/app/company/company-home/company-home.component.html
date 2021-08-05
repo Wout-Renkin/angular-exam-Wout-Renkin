@@ -1,4 +1,4 @@
-<mat-card class="example-card" *ngIf="company">
+<mat-card *ngIf="company">
   <mat-card-header>
     <div mat-card-avatar ></div>
     <mat-card-title [ngStyle]="{'color': company ? company.color : ''}">{{ company.Name }}</mat-card-title>
@@ -13,3 +13,5 @@
     <p>{{company.Street}}  {{company.streetNumber}}, {{company.City}} </p>
   </mat-card-content>
 </mat-card>
+
+<app-group-employee-list></app-group-employee-list>

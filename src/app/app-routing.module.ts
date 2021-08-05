@@ -8,9 +8,10 @@ import { CompanyCreateComponent } from "./company/company-create/company-create.
 import { CompanyHomeComponent } from "./company/company-home/company-home.component";
 import { CompanyComponent } from "./company/company.component";
 import { NoCompanyComponent } from "./company/no-company/no-company.component";
-import { GroupDetailComponent } from "./group/group-detail/group-detail.component";
-import { GroupEditComponent } from "./group/group-edit/group-edit.component";
-import { GroupListComponent } from "./group/group-list/group-list.component";
+import { GroupDetailComponent } from "./group/group-detail-manage/group-detail.component";
+import { GroupEditComponent } from "./group/group-edit-manage/group-edit.component";
+import { GroupListComponent } from "./group/group-list-manage/group-list.component";
+import { PostListComponent } from "./post/post-list/post-list.component";
 import { UserComponent } from "./user/user.component";
 
 const routes: Routes = [
@@ -21,17 +22,14 @@ const routes: Routes = [
   canActivate:[AuthGuard],
   children: [
     {path: 'new', component: CompanyCreateComponent},
- //  {path: 'admin', component: CompanyAdminComponent},
     {path: 'users', component: UserComponent},
     {path: 'nocompany', component: NoCompanyComponent},
     {path: 'home', component: CompanyHomeComponent, canActivate:[CompanyGuard]},
     {path: 'edit/:companyId', component: CompanyCreateComponent},
     {path: 'group', component: GroupListComponent},
-    {path: 'group/manage/:groupId', component: GroupDetailComponent}
+    {path: 'group/manage/:groupId', component: GroupDetailComponent},
+    {path: 'group/home/:groupId', component: PostListComponent}
   ]},
-
-  //{path:'signup', component: SignupComponent, canActivate: [AuthGuard]},
-
 ]
 
 @NgModule({

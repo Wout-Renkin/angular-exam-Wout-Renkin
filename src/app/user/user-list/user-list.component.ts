@@ -4,6 +4,7 @@ import { fromEvent, Subject, Subscription } from 'rxjs';
 import { User } from 'src/app/models/user.model';
 import { UserService } from '../user.service';
 import { debounceTime } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user-list',
@@ -24,7 +25,7 @@ export class UserListComponent implements OnInit, OnDestroy{
   loggedInUser: User;
   test = new Subject<string>();
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private toastr: ToastrService) { }
 
   ngOnInit() {
 
@@ -40,6 +41,7 @@ export class UserListComponent implements OnInit, OnDestroy{
   addUserToCompany(user: User) {
     this.userService.updateUser(user).subscribe(() => {
       this.userService.getUsers(this.usersPerPage, this.currentPage,  this.selected, this.filter);
+      this.toastr.success('User ' + user.firstName + ' ' + user.lastName + " added to your company!");
     });
   }
 
@@ -91,6 +93,11 @@ export class UserListComponent implements OnInit, OnDestroy{
 
   toggleModerator(event, user) {
     this.userService.updateUser(user, event.checked).subscribe(() => {
+      if(event.checked == true) {
+        this.toastr.success('User ' + user.firstName + ' ' + user.lastName + " promoted to moderator!");
+      } else {
+        this.toastr.success('User ' + user.firstName + ' ' + user.lastName + " demoted from moderator!");
+      }
       this.userService.getUsers(this.usersPerPage, this.currentPage,  this.selected, this.filter);
     });
 
@@ -99,6 +106,7 @@ export class UserListComponent implements OnInit, OnDestroy{
   deleteUserFromCompany(user: User) {
     this.userService.updateUser(user, false, true).subscribe(() => {
       this.userService.getUsers(this.usersPerPage, this.currentPage,  this.selected, this.filter);
+      this.toastr.success('User ' + user.firstName + ' ' + user.lastName + " removed from your company!");
     });
   }
 

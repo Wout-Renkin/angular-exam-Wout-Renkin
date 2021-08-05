@@ -10,8 +10,8 @@
         <input type="email" matInput placeholder="jane.doe@hotmail.com" ngModel name="email" #emailInput="ngModel" required autocomplete="on" >
         <mat-icon matSuffix>email</mat-icon>
         <mat-error *ngIf="emailInput.invalid">Please enter a valid email.</mat-error>
-      </mat-form-field><br/>
-
+      </mat-form-field>
+      <br/>
       <mat-form-field appearance="outline">
         <mat-label>Password</mat-label>
         <input type="password" matInput placeholder="password" ngModel name="password" #passwordInput="ngModel" required autocomplete="on">

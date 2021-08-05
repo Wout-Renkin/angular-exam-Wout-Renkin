@@ -27,6 +27,14 @@ export class GroupListComponent implements OnInit, OnDestroy {
 
   manageGroup(groupId: number) {
     console.log(groupId)
-
   }
+
+  deleteGroup(group) {
+    this.groupService.deleteGroup(group);
+  }
+
+  editGroup(group) {
+    this.groupService.sendSelectedItem(group);
+  }
+
 }

@@ -1,0 +1,20 @@
+<mat-card class="example-card">
+  <mat-card-header>
+    <div mat-card-avatar class="example-header-image"></div>
+    <mat-card-subtitle *ngIf="!editMode">Create new group</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="editMode">Editing {{ group.name }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <form (submit)="onSubmit(groupForm)" #groupForm="ngForm">
+      <mat-form-field>
+        <mat-label>Group name</mat-label>
+        <input type="text" matInput placeholder="HR department" ngModel name="name" #nameInput="ngModel" required autocomplete="on" >
+        <mat-icon matSuffix></mat-icon>
+        <mat-error *ngIf="nameInput.invalid">Please enter a valid name.</mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary" [disabled]="groupForm.invalid" *ngIf="!editMode">Add</button>
+      <button *ngIf="editMode" mat-raised-button color="primary" [disabled]="groupForm.invalid">Save</button>
+      <button type="button" (click)="switchToAdd()" *ngIf="editMode" mat-raised-button color="primary">Back</button>
+    </form>
+  </mat-card-content>
+</mat-card>

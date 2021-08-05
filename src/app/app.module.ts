@@ -34,9 +34,16 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { NoCompanyComponent } from './company/no-company/no-company.component';
 import { CompanyHomeComponent } from './company/company-home/company-home.component';
-import { GroupListComponent } from './group/group-list/group-list.component';
-import { GroupEditComponent } from './group/group-edit/group-edit.component';
-import { GroupDetailComponent } from './group/group-detail/group-detail.component';
+import { GroupListComponent } from './group/group-list-manage/group-list.component';
+import { GroupEditComponent } from './group/group-edit-manage/group-edit.component';
+import { GroupDetailComponent } from './group/group-detail-manage/group-detail.component';
+import { ToastrModule } from 'ngx-toastr';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { GroupEmployeeListComponent } from './group/group-employee-list/group-employee-list.component';
+import { PostListComponent } from './post/post-list/post-list.component';
+import { EditPostComponent } from './post/edit-post/edit-post.component';
+import {MatExpansionModule} from '@angular/material/expansion';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 
 
@@ -55,6 +62,9 @@ import { GroupDetailComponent } from './group/group-detail/group-detail.componen
     GroupListComponent,
     GroupEditComponent,
     GroupDetailComponent,
+    GroupEmployeeListComponent,
+    PostListComponent,
+    EditPostComponent,
   ],
   imports: [
     BrowserModule,
@@ -80,7 +90,11 @@ import { GroupDetailComponent } from './group/group-detail/group-detail.componen
     MatTableModule,
     MatPaginatorModule,
     MatSelectModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    ToastrModule.forRoot(),
+    MatTooltipModule,
+    MatExpansionModule,
+    InfiniteScrollModule
   ],
   providers: [{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},],
   bootstrap: [AppComponent]

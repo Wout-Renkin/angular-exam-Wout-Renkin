@@ -31,9 +31,10 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
         return;
       } else {
         this.form.value.color = this.color;
-        this.form.value.backgroundColor = this.color;
+        this.form.value.backgroundColor = this.backgroundColor;
         if(this.mode == "edit") {
-          this.companyService.updateCompany(this.form.value, this.companyId);
+          console.log("we are here")
+          this.companyService.updateCompany(this.form.value, this.company.id);
         } else {
           this.companyService.createCompany(this.form.value);
         }
@@ -41,6 +42,9 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
       }
 
   ngOnInit() {
+    this.companySub = this.companyService.company.subscribe(company => {
+      this.company = company;
+    })
 
     this.form = new FormGroup({
       'name': new FormControl(null, {validators: [Validators.required, Validators.minLength(3)]}),
@@ -50,29 +54,35 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
       'description': new FormControl(null, {validators: [Validators.required]}),
       'backgroundColor': new FormControl(null),
       'color': new FormControl(null),
-      'image': new FormControl(null, {validators: [Validators.required], asyncValidators: [mimeType]})
+      'imagePath': new FormControl(null, {validators: [Validators.required], asyncValidators: [mimeType]})
     })
 
-    this.companySub = this.companyService.company.subscribe(company => {
-      this.company = company;
-    })
+
+
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if(paramMap.has("companyId")) {
 
         this.mode = "edit";
         this.companyId = +paramMap.get("companyId");
         this.companyService.getCompany(this.companyId);
-        this.form.setValue({
-          name: this.company.Name,
-          city: this.company.City,
-          street: this.company.Street,
-          streetNumber: this.company.streetNumber,
-          description: this.company.description,
-          backgroundColor: this.company.backgroundColor,
-          color: this.company.color,
-          image: this.company.imagePath
-        })
-        this.imagePreview = this.company.imagePath;
+
+        if(this.company) {
+          this.form.setValue({
+            name: this.company.Name,
+            city: this.company.City,
+            street: this.company.Street,
+            streetNumber: this.company.streetNumber,
+            description: this.company.description,
+            backgroundColor: this.company.backgroundColor,
+            color: this.company.color,
+            imagePath: this.company.imagePath
+          })
+          this.color = this.company.color;
+          this.backgroundColor = this.company.backgroundColor;
+          this.imagePreview = this.company.imagePath;
+        }
+
+
       } else {
         this.company = null;
         this.mode = "create";
@@ -87,9 +97,9 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
   onImagePicked(event: Event) {
     const image = (event.target as HTMLInputElement).files[0];
     //patchvalue -> target a single value of the form
-    this.form.patchValue({image: image});
+    this.form.patchValue({imagePath: image});
     //validate the image inserted in the image form
-    this.form.get('image').updateValueAndValidity();
+    this.form.get('imagePath').updateValueAndValidity();
     //create file reader
     const reader = new FileReader();
     //if it is done reading i want to save the result as a string in imagePreview

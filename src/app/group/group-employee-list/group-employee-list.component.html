@@ -1,0 +1,39 @@
+
+  <mat-card>
+    <mat-nav-list>
+      <div mat-subheader> My groups
+      </div>
+      <span *ngFor="let group of groupsFromUser" >
+        <mat-list-item *ngIf="!group.groupRequest" [routerLink]="['/company/group/home/', group.group.groupId]">
+          <a matLine  >{{ group.group.name}}</a>
+          <mat-divider></mat-divider>
+       </mat-list-item>
+      </span >
+    </mat-nav-list>
+    </mat-card>
+    <mat-card>
+      <mat-nav-list>
+        <div mat-subheader> My group requests
+        </div>
+        <span *ngFor="let group of groupsFromUser" >
+          <mat-list-item *ngIf="group.groupRequest">
+            <a matLine>{{ group.group.name}} (Request pending)</a>
+            <mat-divider></mat-divider>
+         </mat-list-item>
+        </span >
+      </mat-nav-list>
+      </mat-card>
+    <mat-card>
+      <mat-nav-list>
+        <div mat-subheader> Other groups
+        </div>
+        <span *ngFor="let group of allGroups">
+          <mat-list-item *ngIf="!checkIfUserHasGroup(group.groupId)">
+            <a matLine>{{ group.name}}</a>
+            <button mat-raised-button color="primary" #tooltip="matTooltip" matTooltip="Request to join group" matTooltipPosition="below" (click)="sendJoinRequest(group)">Request to join</button>
+            <mat-divider></mat-divider>
+         </mat-list-item>
+        </span>
+      </mat-nav-list>
+      </mat-card>
+
