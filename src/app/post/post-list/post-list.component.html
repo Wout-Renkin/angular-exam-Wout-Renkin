@@ -1,42 +1,121 @@
+ <div *ngIf="loadingGroup || loadingGroupUsers || loadingPosts">
+   <mat-spinner></mat-spinner>
+ </div>
+ <span *ngIf="!loadingGroup && !loadingGroupUsers && !loadingPosts">
+  <mat-card class="post">
+    <mat-list>
+    <mat-list-item *ngIf="group" >
+      <img matListAvatar [src]="group.imagePath" alt="...">
+       <a matLine>{{ group.name }}</a>
+       <button
+       mat-icon-button color="accent"
+       #tooltip="matTooltip"
+       matTooltip="Manage group"
+       matTooltipPosition="below"
+       [routerLink]="['/company/group/manage/', group.groupId]"
+       *ngIf="checkPermissions(0)">
+       <mat-icon>manage_accounts</mat-icon>
+      </button>
+       <button
+       mat-raised-button color="primary"
+       #tooltip="matTooltip"
+       matTooltip="Request moderator"
+       matTooltipPosition="below" (click)="requestModerator()" *ngIf="!checkModeratorRequest() && !checkPermissions(0)">Request moderator
+      </button>
+       <button
+       mat-raised-button
+       color="primary"
+       #tooltip="matTooltip"
+       matTooltip="Moderator requested"
+       disabled='true'
+       matTooltipPosition="below"
+       *ngIf="checkModeratorRequest()">Moderator requested!
+      </button>
+    </mat-list-item>
+    </mat-list>
+  </mat-card>
 
-<div class="search-results"
-      infinite-scroll
-         [infiniteScrollDistance]="scrollDistance"
-         [infiniteScrollUpDistance]="scrollUpDistance"
-         [infiniteScrollThrottle]="throttle"
-         (scrolled)="onScrollDown()"
-         (scrolledUp)="onScrollUp()"
-         infiniteScrollContainer=".my-sidenav-content"
-         [fromRoot]="true"
-         [scrollWindow]="false">
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <mat-icon>chat</mat-icon>
-             Create a post
-          </mat-panel-title>
-          <mat-panel-description>
-            Click to create a post
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-        <app-edit-post [groupId] = "groupId"></app-edit-post>
-      </mat-expansion-panel>
-      <span *ngFor="let post of posts">
-        <mat-card *ngIf="editPostNumber != post.postId">
-          <mat-card-header color="primary">
-            <mat-card-title>{{post.title}}</mat-card-title>
-            <mat-card-subtitle>Post created by: {{post.user.firstName}} {{post.user.lastName}}</mat-card-subtitle>
-          </mat-card-header>
-          <img *ngIf="post.imagePath != 'null'" mat-card-image [src]="post.imagePath">
-          <mat-card-content>
-            {{post.body}}
-          </mat-card-content>
-          <mat-divider></mat-divider>
-          <mat-card-actions>
-            <button mat-button>LIKE</button>
-            <button mat-button (click)="editMode(post)">EDIT</button>
-          </mat-card-actions>
-        </mat-card>
-        <app-edit-post *ngIf="editPostNumber == post.postId" [postId] = "editPostNumber" (stopEditing)="stopEditing()"></app-edit-post>
-      </span>
+
+
+  <div class="search-results"
+  infinite-scroll
+     [infiniteScrollDistance]="scrollDistance"
+     [infiniteScrollUpDistance]="scrollUpDistance"
+     [infiniteScrollThrottle]="throttle"
+     (scrolled)="onScrollDown()"
+     infiniteScrollContainer=".my-sidenav-content"
+     [fromRoot]="true"
+     [scrollWindow]="false">
+
+  <mat-expansion-panel class="createPost">
+    <mat-expansion-panel-header >
+      <mat-panel-title>
+        <mat-icon>chat</mat-icon>
+         Create a post
+      </mat-panel-title>
+      <mat-panel-description>
+        Click to create a post
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-edit-post [groupId] = "groupId"></app-edit-post>
+  </mat-expansion-panel>
+
+  <span *ngFor="let post of posts">
+    <mat-card *ngIf="editPostNumber != post.postId" class="post">
+      <mat-card-header color="primary" >
+        <mat-card-title>{{post.title}}</mat-card-title>
+        <mat-card-subtitle>Post created by: {{post.user.firstName}} {{post.user.lastName}}</mat-card-subtitle>
+        <img *ngIf="post.imagePath != 'null'" mat-card-avatar src="{{post.imagePath}}">
+            <div style="flex-grow: 1"></div>
+        <button mat-icon-button color="warn" (click)="deletePost(post)" *ngIf="checkPermissions(post.user.userID)"><mat-icon>close</mat-icon></button>
+      </mat-card-header>
+
+      <img class="postImage" *ngIf="post.imagePath != 'null'" mat-card-image [src]="post.imagePath">
+
+      <mat-card-content>
+        {{post.body}}
+      </mat-card-content>
+      <mat-divider></mat-divider>
+
+      <mat-card-actions>
+        <button mat-icon-button color="primary" #tooltip="matTooltip" [matTooltip]="'Like post'" matTooltipPosition="below" (click)="likePost(post)" *ngIf="!checkIfLiked(post.likes)"><mat-icon >favorite_border</mat-icon></button>
+        <button mat-icon-button color="warn" #tooltip="matTooltip" [matTooltip]="'Like post'" matTooltipPosition="below" (click)="likePost(post)" *ngIf="checkIfLiked(post.likes)"><mat-icon>favorite</mat-icon></button>
+        <span >{{post.likes.length}}</span>
+        <button mat-button (click)="editMode(post)" *ngIf="checkPermissions(post.user.userID)">EDIT</button>
+      </mat-card-actions>
+      <mat-accordion>
+        <mat-expansion-panel class="mat-elevation-z0" >
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>chat</mat-icon>
+            </mat-panel-title>
+            <mat-panel-description>
+              Comment section
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <app-comment-create [postId]="post.postId"></app-comment-create>
+          <span *ngIf="post.comments.length > 0">
+            <mat-card *ngFor="let comment of post.comments" class="comment mat-elevation-z8">
+            <div  style="display:flex">
+              <div>
+                <mat-card-subtitle>Comment by: {{comment["user"]["firstName"]}} {{comment["user"]["lastName"]}}</mat-card-subtitle>
+              </div>
+              <div style="flex-grow: 1"></div>
+              <button mat-icon-button color="warn" #tooltip="matTooltip" matTooltip="Remove comment" matTooltipPosition="below" (click)="removeComment(comment)" *ngIf="checkPermissions(comment['user']['userID'])"> <mat-icon>delete</mat-icon></button>
+            </div>
+
+              <div>{{comment["body"]}}</div>
+            </mat-card>
+          </span>
+          <p  *ngIf="post.comments.length === 0"> No comments found</p>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+    </mat-card>
+    <app-edit-post *ngIf="editPostNumber == post.postId" [postId] = "editPostNumber" (stopEditing)="stopEditing()"></app-edit-post>
+  </span>
 </div>
+
+</span>
+

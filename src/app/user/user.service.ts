@@ -3,8 +3,6 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Subject } from "rxjs";
 import {  map } from "rxjs/operators";
-import { AuthService } from "../auth/auth.service";
-import { CompanyService } from "../company/company.service";
 import { User } from "../models/user.model";
 
 
@@ -19,7 +17,6 @@ export class UserService {
 
   getUsers (pageSize: number, currentPage: number, selectedValue: string, filter: string) {
 
-    console.log("GET USERS API CALL")
     const loggedInUser: User = JSON.parse(localStorage.getItem('user'))
 
     switch(selectedValue) {

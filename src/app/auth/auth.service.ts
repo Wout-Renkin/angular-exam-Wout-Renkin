@@ -2,9 +2,9 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { BehaviorSubject } from "rxjs";
-import { CompanyService } from "../company/company.service";
 import { User } from "../models/user.model";
 import { AuthData } from "./auth-data.model";
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({providedIn: "root"})
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
   //Our user subscription
   user = new BehaviorSubject<User>(null);
 
-  constructor(private http: HttpClient, private router: Router){}
+  constructor(private http: HttpClient, private router: Router, private toastr: ToastrService){}
 
   //Simple create user function
   createUser (email: string, password: string, firstName: string, lastName: string) {
@@ -26,12 +26,12 @@ export class AuthService {
     this.http.post("https://localhost:44348/api/User", authData).subscribe(response => {
       //If we succesfully registered our user we redirect to the login page.
       this.router.navigate(['/login'])
+      this.toastr.success("Successfully created a user, login to get started.")
     })
   }
 
   login(email: string, password: string) {
 
-    console.log("AUTHENTICATE API CALL")
 
     this.http.post<any>("https://localhost:44348/api/User/Authenticate", {email: email, password: password}).subscribe(response => {
 
@@ -58,7 +58,6 @@ export class AuthService {
   //Function used to update a users role
   updateUserRole(roleId: number, companyId: number) {
 
-    console.log("UPDATE USER ROLE API CALL")
 
     //We get our authenticated user
     this.authUser = this.user.value;
@@ -73,8 +72,18 @@ export class AuthService {
       //Broadcast our new changes and overwrite the localstorage user
       this.user.next(this.authUser);
       localStorage.setItem('user', JSON.stringify(this.user.value));
+    })
+  }
 
-
+  updateUser(email: string, firstName: string, lastName: string) {
+    this.authUser.email = email;
+    this.authUser.firstName = firstName;
+    this.authUser.lastName = lastName
+    this.http.put("https://localhost:44348/api/User/" + this.authUser.userID, this.authUser).subscribe(user => {
+      this.user.next(this.authUser)
+      localStorage.setItem('user', JSON.stringify(this.authUser))
+      this.toastr.success("You've successfully updated your profile!")
+     // this.router.navigate(['/'])
     })
   }
 
@@ -98,7 +107,6 @@ export class AuthService {
 
   logout () {
     //Logout the user
-    console.log("User logged out")
     //Remove the user from localstorage
     this.clearAuthData();
     //Let listeners know the user changed

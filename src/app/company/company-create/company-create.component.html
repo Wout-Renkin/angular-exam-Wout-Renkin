@@ -1,7 +1,9 @@
 <div>
   <mat-card class="card form">
     <mat-card-header>
-        <mat-card-title>Create company</mat-card-title>
+        <mat-card-title *ngIf="mode == 'edit' && company">Edit {{company.Name}}</mat-card-title>
+        <mat-card-title *ngIf="mode != 'edit'">Create company</mat-card-title>
+
     </mat-card-header>
 
     <mat-card-content>

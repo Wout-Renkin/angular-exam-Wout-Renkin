@@ -1,0 +1,49 @@
+$themeColor: var(--theme-color);
+
+.post {
+  margin: auto auto 2% auto;
+  max-width: 50%;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px $themeColor;
+  border: 1px solid $themeColor;
+}
+
+.search-results{
+  height : 100%;
+}
+
+.comment {
+  margin-top: 2%;
+}
+
+.createPost {
+  max-width: 53%;
+  margin: auto auto 2% auto;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px $themeColor;
+}
+
+.postImage{
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+@media screen and (max-width: 1100px) {
+  .post {
+    margin: auto auto 5% auto;
+    max-width: 100%;
+  }
+
+  .createPost  {
+    max-width: 100%;
+    margin: auto auto 5% auto;
+  }
+}
+
+
+.header {
+  background-size: cover;
+}
+
+mat-spinner {
+  margin: auto;
+}
+

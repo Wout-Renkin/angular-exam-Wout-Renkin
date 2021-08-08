@@ -2,6 +2,7 @@ import { Company } from "./company.model";
 import { Group } from "./group.model";
 import { Like } from "./like.model";
 import { User } from "./user.model";
+import { Comment } from "./comment.model";
 
 export class Post {
   constructor(

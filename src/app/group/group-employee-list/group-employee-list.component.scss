@@ -1,0 +1,11 @@
+mat-card{
+  max-width: 80%;
+  margin: 2% auto;
+ }
+
+ @media screen and (max-width: 1100px) {
+  mat-card{
+    max-width: 100%;
+    margin: 5% auto;
+   }
+ }

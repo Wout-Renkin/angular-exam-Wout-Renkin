@@ -1,0 +1,10 @@
+<form (submit)="onSubmit(commentForm)" #commentForm="ngForm">
+  <mat-form-field appearance="outline">
+    <mat-label>Add a new comment</mat-label>
+    <input type="text" matInput placeholder="Really like your post!" ngModel name="body" #commentInput="ngModel" required autocomplete="on" >
+    <mat-icon matSuffix>email</mat-icon>
+    <mat-error *ngIf="commentInput.invalid">Please enter a valid comment.</mat-error>
+  </mat-form-field>
+  <button mat-icon-button color="primary" [disabled]="commentForm.invalid"><mat-icon matSuffix>send</mat-icon></button>
+</form>
+

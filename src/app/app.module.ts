@@ -44,6 +44,8 @@ import { PostListComponent } from './post/post-list/post-list.component';
 import { EditPostComponent } from './post/edit-post/edit-post.component';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import {MatBadgeModule} from '@angular/material/badge';
+import { CommentCreateComponent } from './post/comment-create/comment-create.component';
 
 
 
@@ -65,6 +67,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     GroupEmployeeListComponent,
     PostListComponent,
     EditPostComponent,
+    CommentCreateComponent,
   ],
   imports: [
     BrowserModule,
@@ -94,7 +97,8 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     ToastrModule.forRoot(),
     MatTooltipModule,
     MatExpansionModule,
-    InfiniteScrollModule
+    InfiniteScrollModule,
+    MatBadgeModule
   ],
   providers: [{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},],
   bootstrap: [AppComponent]

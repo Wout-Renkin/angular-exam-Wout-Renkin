@@ -1,16 +1,25 @@
-<app-group-edit></app-group-edit>
-<mat-card>
 
-<mat-nav-list>
-  <div mat-subheader>Groups
+  <div *ngIf="loadingGroup || loadingUserGroup">
+    <mat-spinner></mat-spinner>
   </div>
-  <mat-list-item *ngFor="let group of groups"  >
-     <a matLine>{{ group.name }}</a>
-     <button mat-icon-button color="accent" #tooltip="matTooltip" matTooltip="Manage group" matTooltipPosition="below" [routerLink]="['manage/', group.groupId]"> <mat-icon>manage_accounts</mat-icon></button>
-     <button mat-icon-button><mat-icon color="primary" #tooltip="matTooltip" matTooltip="Edit group name" matTooltipPosition="below" (click)="editGroup(group)">edit</mat-icon></button>
-     <button mat-icon-button color="warn" #tooltip="matTooltip" matTooltip="Remove group" matTooltipPosition="below" (click)="deleteGroup(group)"> <mat-icon>delete</mat-icon></button>
-     <mat-divider></mat-divider>
-  </mat-list-item>
-</mat-nav-list>
+  <span *ngIf="!loadingGroup && !loadingUserGroup ">
+    <app-group-edit *ngIf="!moderator"></app-group-edit>
+    <app-group-edit *ngIf="moderator" [hidden]="moderatorEdit" (editModerator)="editModerator(moderatorEdit)"></app-group-edit>
+    <mat-card>
 
-</mat-card>
+    <mat-nav-list >
+      <div mat-subheader>Groups
+      </div>
+      <mat-list-item *ngFor="let group of groups"  >
+        <img matListAvatar [src]="group.imagePath" [alt]="group.name">
+         <a matLine>{{ group.name }}</a>
+         <button mat-icon-button color="accent" #tooltip="matTooltip" matTooltip="Manage group" matTooltipPosition="below" [routerLink]="['manage/', group.groupId]"> <mat-icon>manage_accounts</mat-icon></button>
+         <button mat-icon-button><mat-icon color="primary" #tooltip="matTooltip" matTooltip="Edit group name" matTooltipPosition="below" (click)="editGroup(group)">edit</mat-icon></button>
+         <button mat-icon-button color="warn" #tooltip="matTooltip" matTooltip="Remove group" matTooltipPosition="below" (click)="deleteGroup(group)"> <mat-icon>delete</mat-icon></button>
+         <mat-divider></mat-divider>
+      </mat-list-item>
+    </mat-nav-list>
+
+    </mat-card>
+
+  </span>

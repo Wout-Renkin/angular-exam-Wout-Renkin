@@ -1,13 +1,12 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { group } from "@angular/animations";
-import { Router } from "@angular/router";
 import { Subject } from "rxjs";
-import { first, map } from "rxjs/operators";
 import { ToastrService } from 'ngx-toastr';
 import { Post } from "src/app/models/post.model";
 import { User } from "../models/user.model";
-import { Company } from "../models/company.model";
+import { Like } from "../models/like.model";
+import { Comment } from "../models/comment.model";
+
 
 
 @Injectable({providedIn: "root"})
@@ -21,13 +20,12 @@ export class PostService {
   getPosts(groupId, pageSize: number, currentPage: number) {
    return this.http.get<any>("https://localhost:44348/api/Post/group/" + groupId,  {params: {pageSize: pageSize, currentPage: currentPage}})
     .subscribe(response => {
-      console.log("GETTIN MORE POSTS")
-      console.log(response)
       if(this.posts) {
         this.posts = this.posts.concat(response);
       } else {
         this.posts = response
       }
+      console.log("doing this twice ...")
       this.postsUpdated.next([...this.posts])
     })
   }
@@ -72,10 +70,8 @@ export class PostService {
     postData.append("groupId", groupId.toString());
 
     this.http.post<any>("https://localhost:44348/api/Post", postData).subscribe(response => {
-      this.post = response;
-      this.post.user = new User(user.userID, user.email, user.firstName, user.lastName, user.roleId, user.companyId, null);
-      this.posts.unshift(response);
-      this.postsUpdated.next([...this.posts])
+      this.posts = null;
+      this.getPosts(groupId, 5, 1);
       this.toastr.success("You've successfully create a post!");
     })
   }
@@ -83,6 +79,73 @@ export class PostService {
 
   getPost(postId) {
     return this.http.get<Post>("https://localhost:44348/api/Post/" + postId);
+  }
+
+  createLike(user: User, postId:number) {
+    this.http.post<any>("https://localhost:44348/api/Like",  {userId: user.userID, postId: postId}).subscribe(response => {
+      const like: Like = response;
+      like.user = user;
+      const updatedPosts = [...this.posts];
+      const oldPostIndex = updatedPosts.findIndex(p => p.postId === postId);
+      updatedPosts[oldPostIndex].likes.push(like);
+      this.posts = updatedPosts;
+      this.postsUpdated.next([...this.posts]);
+      this.toastr.success("You've liked a post of " + updatedPosts[oldPostIndex].user.firstName);
+    })
+  }
+
+  deleteLike(like: Like) {
+    this.http.delete<any>("https://localhost:44348/api/Like/" + like.likeId).subscribe(response => {
+      const updatedPosts = [...this.posts];
+      const oldPostIndex = updatedPosts.findIndex(p => p.postId === like.postId)
+      const indexOfLike = updatedPosts[oldPostIndex].likes.findIndex(x => x.likeId === like.likeId)
+      updatedPosts[oldPostIndex].likes.splice(indexOfLike, 1)
+      this.posts = updatedPosts;
+      this.postsUpdated.next([...this.posts]);
+      this.toastr.success("You've disliked a post of " + updatedPosts[oldPostIndex].user.firstName);
+    })
+  }
+
+  clearPosts() {
+    this.posts = null;
+    this.postsUpdated.next(this.posts);
+  }
+
+  deleteComment(comment: Comment) {
+    this.http.delete<any>("https://localhost:44348/api/Comment/" + comment.commentId).subscribe(response => {
+      const updatedPosts = [...this.posts];
+      const oldPostIndex = updatedPosts.findIndex(p => p.postId === comment.postId)
+      const indexOfComment = updatedPosts[oldPostIndex].comments.findIndex(x => x.commentId === comment.commentId)
+      updatedPosts[oldPostIndex].comments.splice(indexOfComment, 1)
+      this.posts = updatedPosts;
+      this.postsUpdated.next([...this.posts]);
+      this.toastr.success("You've removed a comment!");
+    })
+  }
+
+  createComment(postId, body:string) {
+    const user: User = JSON.parse(localStorage.getItem('user'));
+    this.http.post<any>("https://localhost:44348/api/Comment", {body: body, postId: postId, userId: user.userID}).subscribe(response => {
+      const comment: Comment = response;
+      comment.user = user;
+      const updatedPosts = [...this.posts];
+      const oldPostIndex = updatedPosts.findIndex(p => p.postId === postId);
+      updatedPosts[oldPostIndex].comments.push(comment);
+      this.posts = updatedPosts;
+      this.postsUpdated.next([...this.posts]);
+      this.toastr.success("You've added a comment!");
+    })
+  }
+
+  deletePost(post: Post) {
+    this.http.delete<any>("https://localhost:44348/api/Post/" + post.postId).subscribe(response => {
+      const updatedPosts = [...this.posts];
+      const oldPostIndex = updatedPosts.findIndex(p => p.postId === post.postId);
+      updatedPosts.splice(oldPostIndex, 1)
+      this.posts = updatedPosts;
+      this.postsUpdated.next([...this.posts]);
+      this.toastr.success("You've delete a post from: " + post.user.firstName + " " + post.user.lastName);
+    })
   }
 
 }

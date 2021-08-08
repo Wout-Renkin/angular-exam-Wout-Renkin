@@ -10,7 +10,7 @@ import { PostService } from '../post.service';
 @Component({
   selector: 'app-edit-post',
   templateUrl: './edit-post.component.html',
-  styleUrls: ['./edit-post.component.css']
+  styleUrls: ['./edit-post.component.scss']
 })
 export class EditPostComponent implements OnInit, OnDestroy{
   form: FormGroup;
@@ -18,6 +18,7 @@ export class EditPostComponent implements OnInit, OnDestroy{
   group: Group;
   groupSub: Subscription;
   post: Post;
+  loading: boolean;
   @Input() groupId: number;
   @Input() postId: number;
   @Output() stopEditing: EventEmitter<number> = new EventEmitter();
@@ -37,8 +38,10 @@ export class EditPostComponent implements OnInit, OnDestroy{
     })
 
     if(this.postId) {
+      this.loading = true;
       this.postService.getPost(this.postId).subscribe(post => {
         this.post = post;
+        this.loading = false;
         this.form.setValue({
           title: this.post.title,
           body: this.post.body,
@@ -79,6 +82,7 @@ export class EditPostComponent implements OnInit, OnDestroy{
 
   clearForm() {
     this.formGroupDirective.resetForm();
+    this.imagePreview = null;
     // this.form.reset();
     // this.form.markAsPristine();
     // this.form.markAsUntouched();

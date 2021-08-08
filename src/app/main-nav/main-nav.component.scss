@@ -41,5 +41,12 @@ ul {
 }
 
 mat-nav-list > a{
-  margin-left: 10%;
+  padding-left: 10%;
+}
+
+
+@media screen and (max-width: 600px) {
+  .main {
+    padding: 0 !important;
+  }
 }

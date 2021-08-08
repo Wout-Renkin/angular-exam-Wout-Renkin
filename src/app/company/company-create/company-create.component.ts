@@ -9,7 +9,7 @@ import {mimeType} from "./mime-type.validator"
 @Component({
   selector: 'app-company-create',
   templateUrl:'./company-create.component.html',
-  styleUrls: ['./company-create.component.css']
+  styleUrls: ['./company-create.component.scss']
 
 })
 export class CompanyCreateComponent implements OnInit, OnDestroy{
@@ -61,7 +61,6 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
 
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if(paramMap.has("companyId")) {
-
         this.mode = "edit";
         this.companyId = +paramMap.get("companyId");
         this.companyService.getCompany(this.companyId);

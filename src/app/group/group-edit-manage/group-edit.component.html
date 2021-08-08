@@ -1,19 +1,37 @@
-<mat-card class="example-card">
+<mat-card>
   <mat-card-header>
-    <div mat-card-avatar class="example-header-image"></div>
+      <img *ngIf="imagePreview !== '' && imagePreview && form.get('imagePath').valid" mat-card-avatar [src]="imagePreview">
     <mat-card-subtitle *ngIf="!editMode">Create new group</mat-card-subtitle>
     <mat-card-subtitle *ngIf="editMode">Editing {{ group.name }}</mat-card-subtitle>
   </mat-card-header>
+  <br>
   <mat-card-content>
-    <form (submit)="onSubmit(groupForm)" #groupForm="ngForm">
+    <form (submit)="onSubmit()" [formGroup]="form" >
       <mat-form-field>
         <mat-label>Group name</mat-label>
-        <input type="text" matInput placeholder="HR department" ngModel name="name" #nameInput="ngModel" required autocomplete="on" >
+        <input type="text" matInput placeholder="HR department" formControlName="name"required autocomplete="on" >
         <mat-icon matSuffix></mat-icon>
-        <mat-error *ngIf="nameInput.invalid">Please enter a valid name.</mat-error>
+        <mat-error *ngIf="form.get('name').invalid">Please enter a valid name.</mat-error>
       </mat-form-field>
-      <button mat-raised-button color="primary" [disabled]="groupForm.invalid" *ngIf="!editMode">Add</button>
-      <button *ngIf="editMode" mat-raised-button color="primary" [disabled]="groupForm.invalid">Save</button>
+      <mat-form-field >
+        <mat-label>Pick a theme color</mat-label >
+        <input
+          matInput
+          [(colorPicker)]="color"
+          [style.color]="color"
+          placeholder="Click to pick a color"
+          [value]="color"
+          formControlName="color">
+        <mat-icon matSuffix  [ngStyle]="{'color': color}">palette</mat-icon>
+      </mat-form-field>
+        <button mat-raised-button color="primary" type="button" (click)="filePicker.click()">Pick image</button>
+        <input
+          type="file"
+          #filePicker
+          (change)="onImagePicked($event)">
+          <br>
+      <button mat-raised-button color="primary" [disabled]="form.invalid" *ngIf="!editMode">Add</button>
+      <button *ngIf="editMode" mat-raised-button color="primary" [disabled]="form.invalid">Save</button>
       <button type="button" (click)="switchToAdd()" *ngIf="editMode" mat-raised-button color="primary">Back</button>
     </form>
   </mat-card-content>

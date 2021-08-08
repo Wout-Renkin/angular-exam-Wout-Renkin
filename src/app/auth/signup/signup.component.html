@@ -1,45 +1,51 @@
 <mat-card id="card" class="login-box">
-	<mat-card-title>
+	<mat-card-title *ngIf="isEditing">
+		Editing {{user?.firstName}}
+	</mat-card-title>
+  <mat-card-title *ngIf="!isEditing">
 		Register
 	</mat-card-title>
+  <br>
 	<mat-card-content>
     <mat-spinner *ngIf="isLoading"></mat-spinner>
     <form (submit)="onSignup(signupForm)" #signupForm="ngForm" *ngIf="!isLoading">
 
       <mat-form-field appearance="outline">
         <mat-label>E-mail</mat-label>
-        <input type="email" matInput placeholder="jane.doe@hotmail.com" ngModel name="email" #emailInput="ngModel" required email autocomplete="on">
+        <input type="email" matInput placeholder="jane.doe@hotmail.com" [ngModel]="user?.email" name="email" #emailInput="ngModel" required email autocomplete="on">
         <mat-icon matSuffix>email</mat-icon>
         <mat-error *ngIf="emailInput.invalid">Please enter a valid email.</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Password</mat-label>
-        <input type="password" matInput placeholder="password" ngModel name="password" #passwordInput="ngModel" required autocomplete="on">
+        <input type="password" matInput placeholder="password" [disabled]="isEditing" ngModel name="password" #passwordInput="ngModel" required autocomplete="on">
         <mat-icon matSuffix>password</mat-icon>
         <mat-error  *ngIf="passwordInput.invalid">Please enter a valid password.</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>First name</mat-label>
-        <input type="text" matInput placeholder="Jane" ngModel name="firstName" #firstNameInput="ngModel" required minlength="3" autocomplete="on">
+        <input type="text" matInput placeholder="Jane" [ngModel]="user?.firstName" name="firstName" #firstNameInput="ngModel" required minlength="3" autocomplete="on">
         <mat-icon matSuffix>badge</mat-icon>
         <mat-error *ngIf="firstNameInput.invalid">Please enter a valid first name.</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Last name</mat-label>
-        <input type="text" matInput placeholder="Doe" ngModel name="lastName" #lastNameInput="ngModel" required minlength="3" autocomplete="on">
+        <input type="text" matInput placeholder="Doe" [ngModel]="user?.lastName" name="lastName" #lastNameInput="ngModel" required minlength="3" autocomplete="on">
         <mat-icon matSuffix>badge</mat-icon>
         <mat-error *ngIf="lastNameInput.invalid">Please enter a valid last name.</mat-error>
       </mat-form-field>
 
-
-
       <br/>
       <br/>
-      <button mat-raised-button color="primary" style="margin-right:5px;" [disabled]="signupForm.invalid">Sign up</button>
-      <button mat-raised-button color="primary" style="margin-right:5px;"  routerLink="/login" >Log in</button>
+      <span *ngIf="!isEditing">
+        <button mat-raised-button color="primary" [disabled]="signupForm.invalid">Sign up</button>
+        <button mat-raised-button color="primary" type="button" routerLink="/login" >Log in</button>
+      </span>
+      <button *ngIf="isEditing" mat-raised-button color="primary" [disabled]="signupForm.invalid">Save</button>
+
     </form>
 
 

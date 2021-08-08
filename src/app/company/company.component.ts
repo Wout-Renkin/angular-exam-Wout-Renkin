@@ -9,7 +9,7 @@ import { CompanyService } from "./company.service";
 @Component({
   selector: 'app-company-create',
   templateUrl:'./company.component.html',
-  styleUrls: ['./company.component.css']
+  styleUrls: ['./company.component.scss']
 
 })
 export class CompanyComponent implements OnInit, OnDestroy{

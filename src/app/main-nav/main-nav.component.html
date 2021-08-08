@@ -4,33 +4,46 @@
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false" >
     <mat-toolbar backgroundColor="primary">Menu</mat-toolbar>
-    <mat-nav-list dense class="test">
-      <a mat-list-item routerLink="/company/home">Home</a>
+    <mat-nav-list dense>
+      <a mat-list-item routerLink="/company/home"><mat-icon>home</mat-icon>Home</a>
     </mat-nav-list>
     <mat-divider></mat-divider>
-    <div *ngIf="isAuthenticated && user.roleId == 4 && company">
-      <mat-list>
-        <mat-list-item routerLink="/company/admin" routerLinkActive="mat-accent" ><mat-icon matListIcon>admin_panel_settings</mat-icon> <strong>Admin</strong> </mat-list-item>
-      </mat-list>
-      <mat-nav-list dense class="test">
-        <a mat-list-item routerLink="/company/users">Manage users</a>
-        <a mat-list-item routerLink="/company/group">Manage groups</a>
-        <a mat-list-item [routerLink]="['/company/edit', company.id]">Edit company</a>
-      </mat-nav-list>
+    <div *ngIf="isAuthenticated && company">
+      <span *ngIf="user.roleId == 4 || user.roleId == 3 || moderator">
+        <mat-list>
+          <mat-list-item><mat-icon matListIcon>admin_panel_settings</mat-icon><strong>Admin</strong> </mat-list-item>
+        </mat-list>
+        <mat-nav-list dense class="test">
+          <a mat-list-item routerLink="/company/users" *ngIf="user.roleId == 4">Manage users</a>
+          <a mat-list-item routerLink="/company/group" *ngIf="user.roleId == 3 || moderator || user.roleId == 4">Manage groups</a>
+          <a mat-list-item [routerLink]="['/company/edit', company.id]" *ngIf="user.roleId == 4">Edit company</a>
+        </mat-nav-list>
+      </span>
+
     </div>
 
+    <!-- *ngFor="let comment of post.comments" -->
     <mat-divider></mat-divider>
-    <mat-list>
-      <mat-list-item routerLink="/company/admin" routerLinkActive="mat-accent" ><mat-icon matListIcon>groups</mat-icon><strong> My groups</strong> </mat-list-item>
-    </mat-list>
-    <mat-nav-list dense class="test">
-      <a mat-list-item href="#">Manage users</a>
-      <a mat-list-item href="#">Manage groups</a>
-      <a mat-list-item href="#">Edit company</a>
-    </mat-nav-list>
+    <span *ngIf="groups">
+      <mat-list>
+        <mat-list-item><mat-icon matListIcon>groups</mat-icon><strong> All groups</strong></mat-list-item>
+      </mat-list>
+      <mat-nav-list dense *ngFor="let group of groups">
+        <a routerLinkActive="mat-accent" mat-list-item [routerLink]="['/company/group/home/', group.groupId]">{{group.name}}</a>
+      </mat-nav-list>
+    </span>
+    <span *ngIf="userGroups">
+      <mat-list>
+        <mat-list-item><mat-icon matListIcon>groups</mat-icon><strong> My groups</strong></mat-list-item>
+      </mat-list>
+      <mat-nav-list dense *ngFor="let group of userGroups">
+        <a routerLinkActive="mat-accent" mat-list-item [routerLink]="['/company/group/home/', group.group.groupId]">{{group.group.name}}</a>
+      </mat-nav-list>
+    </span>
   </mat-sidenav>
   <mat-sidenav-content class="my-sidenav-content">
     <mat-toolbar color="primary"  [ngStyle]="{'background-color': company ? company.backgroundColor : ''}">
+
       <button
         type="button"
         aria-label="Toggle sidenav"
@@ -40,7 +53,7 @@
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span *ngIf="company">{{company.Name}}</span>
-      <span *ngIf="!company"><img class="img-fluid" src="assets/tree.png" height="50x"></span>
+      <span *ngIf="!company"><img src="/assets/CSM_Group.png"></span>
 
       <span class="fill-space"></span>
 
@@ -57,7 +70,7 @@
             Settings
           </button>
           <mat-menu #settingsMenu="matMenu">
-            <button mat-menu-item (click)="onLogout()" *ngIf="isAuthenticated">
+            <button mat-menu-item  routerLink="/profile/edit" *ngIf="isAuthenticated">
               <mat-icon>person</mat-icon>
               Edit profile
             </button>
