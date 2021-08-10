@@ -18,6 +18,7 @@ export class SignupComponent implements OnInit {
   constructor(public authService: AuthService, private router:Router, private toastr: ToastrService) { }
 
   ngOnInit(): void {
+    //Check if user is logged in. Check if the path contains /profile/edit, if so we allow the user to edit, else we redirect.
     this.user = JSON.parse(localStorage.getItem('user'))
     if(this.router.url === "/profile/edit" && this.user) {
       this.isEditing = true;
@@ -33,6 +34,7 @@ export class SignupComponent implements OnInit {
   }
 
   onSignup(form: NgForm){
+    //Depending if the user is editing or not we use updateUser or createUser in our service
     if (form.invalid) {
       return;
     } else {

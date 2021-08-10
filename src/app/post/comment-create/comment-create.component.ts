@@ -14,7 +14,7 @@ export class CommentCreateComponent implements OnInit {
   ngOnInit(): void {
   }
 
-
+  //Create a comment
   onSubmit(form: NgForm) {
     if (form.invalid) {
       return;
@@ -22,7 +22,6 @@ export class CommentCreateComponent implements OnInit {
       this.postService.createComment(this.postId, form.value.body)
       form.resetForm();
 
-      //this.authService.login(form.value.email, form.value.password);
     }
   }
 

@@ -17,29 +17,34 @@ export class EditPostComponent implements OnInit, OnDestroy{
   imagePreview: string;
   group: Group;
   groupSub: Subscription;
+  postSub: Subscription;
   post: Post;
   loading: boolean;
+
+  //Input variables we get from the post-list
   @Input() groupId: number;
   @Input() postId: number;
+
+  //Tell list we stopped editting
   @Output() stopEditing: EventEmitter<number> = new EventEmitter();
+
+  //Needed for reset
   @ViewChild(FormGroupDirective) formGroupDirective: FormGroupDirective;
 
   constructor(private postService: PostService, private groupService: GroupService) { }
 
   ngOnInit(): void {
-    this.groupSub = this.groupService.groupUpdated.subscribe(group => {
-      this.group = group;
-    })
-
+    //Initiate form
     this.form = new FormGroup({
       'title': new FormControl(null, {validators: [Validators.required, Validators.minLength(3)]}),
       'body': new FormControl(null,  {validators: [Validators.required, Validators.minLength(3)]}),
       'imagePath': new FormControl(null, {asyncValidators: [mimeType]})
     })
 
+    //If we have a post Id from the @input we get the post and set values
     if(this.postId) {
       this.loading = true;
-      this.postService.getPost(this.postId).subscribe(post => {
+      this.postSub = this.postService.getPost(this.postId).subscribe(post => {
         this.post = post;
         this.loading = false;
         this.form.setValue({
@@ -55,6 +60,7 @@ export class EditPostComponent implements OnInit, OnDestroy{
     }
   }
 
+  //Depending on edit or create we use different function
   onCreatePost() {
     if (this.form.invalid) {
       return;
@@ -69,24 +75,24 @@ export class EditPostComponent implements OnInit, OnDestroy{
     }
   }
 
+  //Press on cancel and we reset and clear the form. We emit an event telling the post-list that we stopped editting
   cancelEdit() {
     this.post = null;
     this.clearForm();
     this.stopEditing.emit(null);
   }
+
+  //Remove the image
   removeImage() {
     this.form.patchValue({imagePath: null})
     this.imagePreview = null;
 
   }
 
+  //Clear form function
   clearForm() {
     this.formGroupDirective.resetForm();
     this.imagePreview = null;
-    // this.form.reset();
-    // this.form.markAsPristine();
-    // this.form.markAsUntouched();
-    // this.form.updateValueAndValidity();
   }
 
 
@@ -106,8 +112,11 @@ export class EditPostComponent implements OnInit, OnDestroy{
     reader.readAsDataURL(image)
   }
 
+  //Remove subs
   ngOnDestroy() {
-    this.groupSub.unsubscribe();
+    if(this.post) {
+      this.postSub.unsubscribe();
+    }
   }
 
 }

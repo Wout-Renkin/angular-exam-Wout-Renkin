@@ -4,7 +4,9 @@ import { Router } from "@angular/router";
 import { Subject } from "rxjs";
 import {  map } from "rxjs/operators";
 import { User } from "../models/user.model";
+import { environment } from "../../environments/environment";
 
+const BACKEND_URL = environment.apiUrl;
 
 @Injectable({providedIn: "root"})
 export class UserService {
@@ -15,6 +17,7 @@ export class UserService {
 
   constructor(private http: HttpClient, private router: Router){}
 
+  //Get all users with filters
   getUsers (pageSize: number, currentPage: number, selectedValue: string, filter: string) {
 
     const loggedInUser: User = JSON.parse(localStorage.getItem('user'))
@@ -33,7 +36,7 @@ export class UserService {
         this.companyId = 0;
         break;
     }
-    this.http.get<{users: any; totalUsers: number}>("https://localhost:44348/api/User/users", {params: {roleId: this.roleId, pageSize: pageSize, currentPage: currentPage, filter: filter, companyId: this.companyId}}).pipe(
+    this.http.get<{users: any; totalUsers: number}>( BACKEND_URL + "/User/users", {params: {roleId: this.roleId, pageSize: pageSize, currentPage: currentPage, filter: filter, companyId: this.companyId}}).pipe(
       map(response => {
         const loadedUsers = response.users.map(user => {
           return {
@@ -41,7 +44,7 @@ export class UserService {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
-          roleId: user.roleID,
+          roleId: user.roleId,
           companyId: user.companyId,
           _token: user.token
         }
@@ -56,6 +59,7 @@ export class UserService {
     })
   }
 
+  //Update an user (Adding to company or change role)
   updateUser(user: User, moderator: boolean = false, removed: boolean = false) {
 
     const loggedInUser: User = JSON.parse(localStorage.getItem('user'))
@@ -73,7 +77,7 @@ export class UserService {
       }
     }
 
-    return this.http.put("https://localhost:44348/api/User/" + user.userID, user);
+    return this.http.put( BACKEND_URL + "/User/" + user.userID, user);
   }
 
 }

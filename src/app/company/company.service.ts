@@ -6,7 +6,9 @@ import { AuthService } from "../auth/auth.service";
 import { Company } from "../models/company.model";
 import { User } from "../models/user.model";
 import { ToastrService } from 'ngx-toastr';
+import { environment } from "../../environments/environment";
 
+const BACKEND_URL = environment.apiUrl;
 
 @Injectable({providedIn: "root"})
 export class CompanyService {
@@ -25,7 +27,7 @@ export class CompanyService {
       companyData.append(key, company[key]);
   }
 
-    this.http.post<any>("https://localhost:44348/api/Company", companyData).subscribe(response => {
+    this.http.post<any>(BACKEND_URL + "/Company", companyData).subscribe(response => {
       //We save the company in a temporary variable.
       //We save it in our company subscription (broadcast it to listeners that are interested)
       const saveCompany =  new Company(response.companyId, response.name, response.city, response.street, response.streetNumber, response.description, response.color, response.backgroundColor, response.imagePath);
@@ -33,7 +35,6 @@ export class CompanyService {
 
       //Since we created a company we want to update the user with the companyId and the superadmin role
       this.authService.updateUserRole(4, response.companyId)
-
       const updateUser: User = JSON.parse(localStorage.getItem('user'));
       updateUser.companyId = response.companyId;
       localStorage.setItem('user', JSON.stringify(updateUser));
@@ -46,6 +47,7 @@ export class CompanyService {
     })
   }
 
+  //Function to update company
   updateCompany(company: Company, companyId: number) {
     const companyData = new FormData();
     for ( var key in company ) {
@@ -53,7 +55,7 @@ export class CompanyService {
   }
   companyData.append("companyId", companyId.toString())
 
-    this.http.put<any>("https://localhost:44348/api/company/" + companyId, companyData).subscribe(() => {
+    this.http.put<any>(BACKEND_URL + "/company/" + companyId, companyData).subscribe(() => {
       this.router.navigate(["company/home"])
       this.toastr.success('Company successfully updated!');
 
@@ -65,7 +67,7 @@ export class CompanyService {
 
   //Function to get the company of the user
   getCompany (id: number) {
-    this.http.get<any>("https://localhost:44348/api/Company/" + id).subscribe(response => {
+    this.http.get<any>(BACKEND_URL + "/Company/" + id).subscribe(response => {
       const saveCompany = new Company(response.companyId, response.name, response.city, response.street, response.streetNumber, response.description, response.backgroundColor, response.color, response.imagePath);
 
       //Broadcast the company to the listeners
@@ -73,6 +75,7 @@ export class CompanyService {
     })
   }
 
+  //Check if we have a company, used in the company guard.
   hasCompany() {
     const check: User = JSON.parse(localStorage.getItem('user'))
     if(!check.companyId) {
@@ -82,6 +85,7 @@ export class CompanyService {
     }
   }
 
+  //Function to set company to null
   clearCompany() {
     this.company.next(null);
   }

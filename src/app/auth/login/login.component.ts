@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   constructor(public authService: AuthService, private router:Router, private toastr: ToastrService) { }
 
   ngOnInit(): void {
+    //Check if user is already logged in, redirect if logged in.
     if(JSON.parse(localStorage.getItem('user'))){
       this.toastr.error("You are already logged in!")
       this.router.navigate(['/'])
@@ -22,6 +23,7 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin(form: NgForm){
+    //Check if form is invalid, if it is valid login.
     if (form.invalid) {
       return;
     } else {

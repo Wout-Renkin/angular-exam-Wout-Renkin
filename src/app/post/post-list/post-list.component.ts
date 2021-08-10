@@ -64,6 +64,7 @@ export class PostListComponent implements OnInit, OnDestroy {
       if(this.group) {
         this.loadingGroup = false
       }
+      //Set theme color in css var
       document.documentElement.style.setProperty('--theme-color', this.group.themeColor);
     })
 
@@ -92,9 +93,13 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.toastr.error("Sorry access denied, send a request to watch the posts of group")
       }
 
+      //So here we set up a route subscription, we do this so when only the variable at the end of our route changes
+      //It doesn't reinitialize the group
       if(this.groupId) {
         this.routerSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((event) => {
+          //We get the route variable
           const newId = +this.route.snapshot.paramMap.get('groupId')
+          //If the route variable is different from the previous value we call the route changed method
           if(this.groupId !== newId){
             this.groupId = newId;
             this.onRouteChanged()
@@ -104,9 +109,6 @@ export class PostListComponent implements OnInit, OnDestroy {
       }
     })
 
-
-
-
     //All the calls we need to load the information needed.
     this.postService.getPosts(this.groupId, this.pageSize, this.currentPage)
     this.groupService.getGroup(this.groupId);
@@ -114,9 +116,14 @@ export class PostListComponent implements OnInit, OnDestroy {
   }
 
   onRouteChanged() {
-
+    //We set our current page back to 1 (we increment this if we our at the bottom of our page)
     this.currentPage = 1;
+
+    //We call the clear posts function since we don't want to append to the previous group posts
     this.postService.clearPosts();
+
+    //We call the previous calls we DIDN'T do this time since we didn't reinitialize
+    //The subscriptions are still running so all information will be updated
     this.postService.getPosts(this.groupId, this.pageSize, this.currentPage)
     this.groupService.getGroup(this.groupId);
     this.groupService.getUserGroups();
@@ -156,6 +163,7 @@ export class PostListComponent implements OnInit, OnDestroy {
     }
   }
 
+  //Check if the user has clicked on the request moderator button
   checkModeratorRequest() {
     if(this.groupUser){
       if(this.groupUser.moderatorRequest)

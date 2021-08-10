@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { fromEvent, Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { User } from 'src/app/models/user.model';
 import { UserService } from '../user.service';
-import { debounceTime } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -12,25 +11,32 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, OnDestroy{
+  //Users variable
   users: User[] = [];
+
+  //Users subscription
   private usersSub: Subscription;
+
+  //Table variable
   displayedColumns: string[] = ['email', 'first name', 'last name', 'add to company', 'Moderator'];
+
+  //Pagination and filters
   userCount = 0;
   usersPerPage = 10;
   currentPage = 1;
   pageSizeOptions = [5, 10, 20, 50];
   filter: string = "";
   selected: string = 'Users';
+
+  //Boolean to hide columns depending on the filter
   hidden:boolean = true;
-  loggedInUser: User;
-  test = new Subject<string>();
 
   constructor(private userService: UserService, private toastr: ToastrService) { }
 
   ngOnInit() {
 
+    //Get all users with current filters
     this.userService.getUsers(this.usersPerPage, this.currentPage, this.selected, this.filter);
-    this.loggedInUser = JSON.parse(localStorage.getItem('user'));
     this.usersSub = this.userService.usersUpdated.subscribe( userData => {
       this.users = userData.users;
       this.userCount = userData.userCount;
@@ -38,6 +44,8 @@ export class UserListComponent implements OnInit, OnDestroy{
     )
 
   }
+
+  //Add a user to our company
   addUserToCompany(user: User) {
     this.userService.updateUser(user).subscribe(() => {
       this.userService.getUsers(this.usersPerPage, this.currentPage,  this.selected, this.filter);
@@ -45,6 +53,7 @@ export class UserListComponent implements OnInit, OnDestroy{
     });
   }
 
+  //When page changes we need to get new users
   onChangedPage(pageData: PageEvent) {
     this.currentPage = pageData.pageIndex + 1;
     this.usersPerPage = pageData.pageSize;
@@ -57,6 +66,7 @@ export class UserListComponent implements OnInit, OnDestroy{
 
   }
 
+  //Our search filter
   applyFilter(event) {
 
     this.filter = event.target.value
@@ -74,6 +84,7 @@ export class UserListComponent implements OnInit, OnDestroy{
 
   }
 
+  //Our option filter, on change we need to do a call again
   applyOptionFilter(selectedValue: string) {
     this.selected = selectedValue;
     switch(selectedValue) {
@@ -91,6 +102,7 @@ export class UserListComponent implements OnInit, OnDestroy{
 
   }
 
+  //Grant or remove moderator
   toggleModerator(event, user) {
     this.userService.updateUser(user, event.checked).subscribe(() => {
       if(event.checked == true) {
@@ -103,6 +115,7 @@ export class UserListComponent implements OnInit, OnDestroy{
 
   }
 
+  //Delete users from the company
   deleteUserFromCompany(user: User) {
     this.userService.updateUser(user, false, true).subscribe(() => {
       this.userService.getUsers(this.usersPerPage, this.currentPage,  this.selected, this.filter);
@@ -110,6 +123,7 @@ export class UserListComponent implements OnInit, OnDestroy{
     });
   }
 
+  //Destroy subscription
   ngOnDestroy() {
     this.usersSub.unsubscribe();
   }

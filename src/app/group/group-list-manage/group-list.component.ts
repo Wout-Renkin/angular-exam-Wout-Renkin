@@ -13,11 +13,13 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./group-list.component.scss']
 })
 export class GroupListComponent implements OnInit, OnDestroy {
-  groups: Group[] = [];
-  userGroups: GroupUser[];
+
   groupSub: Subscription;
   userGroupsSub: Subscription;
   editGroupSub: Subscription;
+  
+  groups: Group[] = [];
+  userGroups: GroupUser[];
   user: User;
   moderatorEdit: boolean = false;
   moderator: boolean = false;
@@ -27,12 +29,14 @@ export class GroupListComponent implements OnInit, OnDestroy {
   constructor(private groupService: GroupService, private router: Router, private toastr: ToastrService) { }
 
   ngOnInit(): void {
+    //Get all our groups
     this.groupSub = this.groupService.groupsUpdated.subscribe(groups => {
       this.groups = groups;
       this.loadingGroup = false;
-      // if(this.userGroups) {
-      //   this.checkMod()
-      // }
+
+      //If user is a moderator we get the userGroups too
+      //I call this here since if I change something in the group this will be called and we would display all groups
+      //this way I check everything again
       if(this.moderator) {
         this.groupService.getUserGroups();
       }
@@ -54,8 +58,8 @@ export class GroupListComponent implements OnInit, OnDestroy {
   checkMod() {
     //First check if the role of the user is not 3 or 4
     if(this.user.roleId !== 3 && this.user.roleId !== 4) {
-      //this.groupService.getUserGroups();
       //Check if we found any groups of the user and filter so we only get groups where he is moderator
+      //If the person is not a moderator of anything we redirect away from here
       if(this.userGroups.length > 0) {
         this.userGroups =  this.userGroups .filter(x => x.groupModerator === true);
         if(this.userGroups.length > 0) {
@@ -78,6 +82,7 @@ export class GroupListComponent implements OnInit, OnDestroy {
     this.loadingUserGroup = false;
   }
 
+  //Emit event from edit component this way we know if we should show the edit component
   editModerator(moderatorEdit) {
     if(moderatorEdit == true) {
       this.moderatorEdit = false;
@@ -87,22 +92,20 @@ export class GroupListComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy() {
-    this.groupSub.unsubscribe();
-    // this.editGroupSub.unsubscribe();
-    this.userGroupsSub.unsubscribe();
-  }
-
-  manageGroup(groupId: number) {
-    console.log(groupId)
-  }
-
+  //Delete a group
   deleteGroup(group) {
     this.groupService.deleteGroup(group);
   }
 
+  //Edit a group
   editGroup(group) {
     this.groupService.sendSelectedItem(group);
     }
+
+  //Destroy subscriptions
+  ngOnDestroy() {
+    this.groupSub.unsubscribe();
+    this.userGroupsSub.unsubscribe();
+  }
 
 }

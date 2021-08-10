@@ -1,0 +1,20 @@
+p {
+  margin: auto;
+}
+
+mat-card {
+  box-sizing: border-box;
+  width: 50%;
+  margin: 4% auto;
+  background-color:#f5c2c7;
+  color: #842029;
+  border-color: #f5c2c7;
+  display: flex;
+}
+
+
+@media screen and (max-width: 1100px) {
+  mat-card{
+    width: 100%;
+  }
+}

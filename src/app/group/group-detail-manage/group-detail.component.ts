@@ -34,6 +34,7 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
   //Hidden -> We use this so we can hide certain actions depending on which user kind we are showing
   hidden:boolean = false;
 
+  //Variables we use
   user: User;
   group: Group;
   userGroup: GroupUser;
@@ -47,26 +48,34 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
   secondGroupSub: Subscription;
   userGroupSub: Subscription;
 
+  //Check if user is moderatior
   moderator: boolean;
 
   constructor(private route: ActivatedRoute, private groupService: GroupService, private router: Router, private toastr: ToastrService) { }
 
   ngOnInit(): void {
+    //Get our user
     this.user = JSON.parse(localStorage.getItem('user'))
+
+    //Get the group Id
     this.groupId = +this.route.snapshot.paramMap.get('groupId');
 
+    //Call to get our current group
     this.secondGroupSub = this.groupService.groupUpdated.subscribe(group => {
       this.group = group;
     })
 
+    //Function to get the users that are in the group
     this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
 
+    //Subscription to the users, we remove admins and moderators, they don't need a group
     this.groupSub = this.groupService.groupUsersUpdated.subscribe(groupUser => {
       this.groupUsers = groupUser.groupUsers;
       this.groupUsers =this.groupUsers.filter((x) => x.user.roleId !== 4 && x.user.roleId !== 3)
       this.userCount = this.groupUsers.length;
     })
 
+    //This is a check, if the user is not an SuperAdmin or Moderator or GroupModerator he isn't supposed to be here
     this.userGroupSub = this.groupService.userGroupUpdated.subscribe(userGroup => {
       this.userGroup = userGroup;
       if(this.user.roleId !== 3 && this.user.roleId !== 4){
@@ -84,7 +93,9 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
       }
     })
 
+    //Call to initiate the check
     this.groupService.getGroupUser(this.user, this.groupId)
+    //Call to get our group
     this.groupService.getGroup(this.groupId);
   }
 
@@ -141,6 +152,12 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
   //Turn group moderator on and off
   toggleModerator(event, user) {
     this.otherSubs = this.groupService.updateGroupUser(user, event.checked, this.groupId).subscribe(() => {
+      if(event.checked) {
+        this.toastr.success(user.user.firstName + " has been promoted to moderator!")
+      } else {
+        this.toastr.success(user.user.firstName + " has been demoted from moderator!")
+
+      }
       this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
     })
   }
@@ -149,6 +166,7 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
   removeUserFromGroup(user: GroupUser) {
     this.otherSubs = this.groupService.deleteGroupUser(user.groupUserId).subscribe(() => {
       this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
+            this.toastr.success(user.user.firstName + " has been removed from the group!")
     })
   }
 
@@ -156,6 +174,7 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
   addUserToGroup(user: GroupUser) {
     this.otherSubs = this.groupService.addUserToGroup(user, this.groupId).subscribe(() => {
       this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
+      this.toastr.success(user.user.firstName + " has been added to the group!")
     })
   }
 
@@ -164,12 +183,14 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
     if(user.moderatorRequest == true) {
       this.otherSubs = this.groupService.updateGroupUser(user, true, this.groupId).subscribe(() => {
         this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
+        this.toastr.success("Moderator request of " + user.user.firstName + " is approved!")
       })
     }
 
     if(user.groupRequest == true) {
       this.otherSubs = this.groupService.updateGroupUser(user, false, this.groupId).subscribe(() => {
         this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
+        this.toastr.success("Group request of " + user.user.firstName + " is approved!")
       })
     }
   }
@@ -179,16 +200,20 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
     if(user.moderatorRequest == true) {
       this.otherSubs = this.groupService.updateGroupUser(user, false, this.groupId).subscribe(() => {
         this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
+        this.toastr.success("Moderator request of " + user.user.firstName + " is denied!")
+
       })
     }
 
     if(user.groupRequest == true) {
       this.otherSubs = this.groupService.deleteGroupUser(user.groupUserId).subscribe(() => {
         this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
+        this.toastr.success("Group request of " + user.user.firstName + " is denied!")
       })
     }
   }
 
+  //Destroy subs
   ngOnDestroy() {
     this.groupSub.unsubscribe();
     if(this.otherSubs){

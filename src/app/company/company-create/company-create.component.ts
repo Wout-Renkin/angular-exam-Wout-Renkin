@@ -26,7 +26,8 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
   constructor(public companyService: CompanyService, public route: ActivatedRoute) { }
 
     onCreateCompany() {
-
+      //Check if form is valid, afterwards we set our colors since they come from the value attribute which doesn't get recognized
+      //Depending if edit or create we change functions
       if (this.form.invalid) {
         return;
       } else {
@@ -42,10 +43,12 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
       }
 
   ngOnInit() {
+    //Subscribe to company variable in company service
     this.companySub = this.companyService.company.subscribe(company => {
       this.company = company;
     })
 
+    //Initialize form
     this.form = new FormGroup({
       'name': new FormControl(null, {validators: [Validators.required, Validators.minLength(3)]}),
       'city': new FormControl(null,  {validators: [Validators.required, Validators.minLength(3)]}),
@@ -57,14 +60,16 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
       'imagePath': new FormControl(null, {validators: [Validators.required], asyncValidators: [mimeType]})
     })
 
-
-
+    //subscribe to the router parameter, if it cointains companyId we know we are editing
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if(paramMap.has("companyId")) {
         this.mode = "edit";
         this.companyId = +paramMap.get("companyId");
+
+        //Get our company from the backend
         this.companyService.getCompany(this.companyId);
 
+        //If company variable has a value we initialize our form with the correct parameters
         if(this.company) {
           this.form.setValue({
             name: this.company.Name,
@@ -110,6 +115,7 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy() {
+    //Destroy our subscription
     this.companySub.unsubscribe();
   }
 

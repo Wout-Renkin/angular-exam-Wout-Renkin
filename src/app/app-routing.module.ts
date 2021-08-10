@@ -11,7 +11,6 @@ import { CompanyHomeComponent } from "./company/company-home/company-home.compon
 import { CompanyComponent } from "./company/company.component";
 import { NoCompanyComponent } from "./company/no-company/no-company.component";
 import { GroupDetailComponent } from "./group/group-detail-manage/group-detail.component";
-import { GroupEditComponent } from "./group/group-edit-manage/group-edit.component";
 import { GroupListComponent } from "./group/group-list-manage/group-list.component";
 import { PostListComponent } from "./post/post-list/post-list.component";
 import { UserComponent } from "./user/user.component";

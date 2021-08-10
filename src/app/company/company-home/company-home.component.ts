@@ -17,6 +17,8 @@ export class CompanyHomeComponent implements OnInit, OnDestroy{
   constructor(private companyService: CompanyService) { }
 
   ngOnInit(): void {
+
+    //We get the user, subscribe to the company and get the company so we can display it.
     this.user = JSON.parse(localStorage.getItem('user'))
 
     this.companyService.getCompany(this.user.companyId)
@@ -26,6 +28,7 @@ export class CompanyHomeComponent implements OnInit, OnDestroy{
     })
   }
 
+  //Destroy subscription
   ngOnDestroy() {
     this.companySub.unsubscribe();
   }

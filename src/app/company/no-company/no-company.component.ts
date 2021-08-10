@@ -10,6 +10,7 @@ export class NoCompanyComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    //This page is only used to show a mat-card with information and a button to redirect to create company
   }
 
 }

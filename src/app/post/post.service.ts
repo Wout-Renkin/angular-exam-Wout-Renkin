@@ -6,7 +6,9 @@ import { Post } from "src/app/models/post.model";
 import { User } from "../models/user.model";
 import { Like } from "../models/like.model";
 import { Comment } from "../models/comment.model";
+import { environment } from "../../environments/environment";
 
+const BACKEND_URL = environment.apiUrl;
 
 
 @Injectable({providedIn: "root"})
@@ -17,19 +19,21 @@ export class PostService {
   constructor(private http: HttpClient, private toastr: ToastrService) {
   }
 
+  //Function to get all posts
   getPosts(groupId, pageSize: number, currentPage: number) {
-   return this.http.get<any>("https://localhost:44348/api/Post/group/" + groupId,  {params: {pageSize: pageSize, currentPage: currentPage}})
+   return this.http.get<any>(BACKEND_URL + "/Post/group/" + groupId,  {params: {pageSize: pageSize, currentPage: currentPage}})
     .subscribe(response => {
       if(this.posts) {
+        //Concat because we use infinite loader, we add our posts to the other posts
         this.posts = this.posts.concat(response);
       } else {
         this.posts = response
       }
-      console.log("doing this twice ...")
       this.postsUpdated.next([...this.posts])
     })
   }
 
+  //Update a post
   updatePost(oldPost: Post, updatePost: any) {
     const postData = new FormData();
     for ( var key in oldPost ) {
@@ -40,9 +44,7 @@ export class PostService {
     postData.set("body", updatePost.body);
     postData.set("imagePath", updatePost.imagePath);
 
-
-
-    this.http.put<any>("https://localhost:44348/api/Post/" + oldPost.postId, postData).subscribe(
+    this.http.put<any>(BACKEND_URL + "/Post/" + oldPost.postId, postData).subscribe(
       response => {
         oldPost.title = updatePost.title;
         oldPost.body = updatePost.body;
@@ -57,6 +59,7 @@ export class PostService {
     )
   }
 
+  //Create a post
   createPost (post: any, groupId: number) {
 
     const postData = new FormData();
@@ -69,20 +72,21 @@ export class PostService {
     postData.append("userId", user.userID.toString());
     postData.append("groupId", groupId.toString());
 
-    this.http.post<any>("https://localhost:44348/api/Post", postData).subscribe(response => {
+    this.http.post<any>(BACKEND_URL + "/Post", postData).subscribe(response => {
       this.posts = null;
       this.getPosts(groupId, 5, 1);
       this.toastr.success("You've successfully create a post!");
     })
   }
 
-
+  //Get a specific post
   getPost(postId) {
-    return this.http.get<Post>("https://localhost:44348/api/Post/" + postId);
+    return this.http.get<Post>(BACKEND_URL + "/Post/" + postId);
   }
 
+  //Like a post
   createLike(user: User, postId:number) {
-    this.http.post<any>("https://localhost:44348/api/Like",  {userId: user.userID, postId: postId}).subscribe(response => {
+    this.http.post<any>(BACKEND_URL + "/Like",  {userId: user.userID, postId: postId}).subscribe(response => {
       const like: Like = response;
       like.user = user;
       const updatedPosts = [...this.posts];
@@ -94,8 +98,9 @@ export class PostService {
     })
   }
 
+  //Remove a like
   deleteLike(like: Like) {
-    this.http.delete<any>("https://localhost:44348/api/Like/" + like.likeId).subscribe(response => {
+    this.http.delete<any>(BACKEND_URL + "/Like/" + like.likeId).subscribe(response => {
       const updatedPosts = [...this.posts];
       const oldPostIndex = updatedPosts.findIndex(p => p.postId === like.postId)
       const indexOfLike = updatedPosts[oldPostIndex].likes.findIndex(x => x.likeId === like.likeId)
@@ -106,13 +111,15 @@ export class PostService {
     })
   }
 
+  //Remove posts, we need this when we switch to another group we don't want to append to the previous group posts
   clearPosts() {
     this.posts = null;
     this.postsUpdated.next(this.posts);
   }
 
+  //Delete a comment
   deleteComment(comment: Comment) {
-    this.http.delete<any>("https://localhost:44348/api/Comment/" + comment.commentId).subscribe(response => {
+    this.http.delete<any>(BACKEND_URL + "/Comment/" + comment.commentId).subscribe(response => {
       const updatedPosts = [...this.posts];
       const oldPostIndex = updatedPosts.findIndex(p => p.postId === comment.postId)
       const indexOfComment = updatedPosts[oldPostIndex].comments.findIndex(x => x.commentId === comment.commentId)
@@ -123,9 +130,10 @@ export class PostService {
     })
   }
 
+  //Create a comment
   createComment(postId, body:string) {
     const user: User = JSON.parse(localStorage.getItem('user'));
-    this.http.post<any>("https://localhost:44348/api/Comment", {body: body, postId: postId, userId: user.userID}).subscribe(response => {
+    this.http.post<any>(BACKEND_URL + "/Comment", {body: body, postId: postId, userId: user.userID}).subscribe(response => {
       const comment: Comment = response;
       comment.user = user;
       const updatedPosts = [...this.posts];
@@ -137,8 +145,9 @@ export class PostService {
     })
   }
 
+  //Delete a post
   deletePost(post: Post) {
-    this.http.delete<any>("https://localhost:44348/api/Post/" + post.postId).subscribe(response => {
+    this.http.delete<any>(BACKEND_URL + "/Post/" + post.postId).subscribe(response => {
       const updatedPosts = [...this.posts];
       const oldPostIndex = updatedPosts.findIndex(p => p.postId === post.postId);
       updatedPosts.splice(oldPostIndex, 1)

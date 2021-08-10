@@ -5,6 +5,9 @@ import { BehaviorSubject } from "rxjs";
 import { User } from "../models/user.model";
 import { AuthData } from "./auth-data.model";
 import { ToastrService } from 'ngx-toastr';
+import { environment } from "../../environments/environment";
+
+const BACKEND_URL = environment.apiUrl;
 
 @Injectable({providedIn: "root"})
 export class AuthService {
@@ -21,9 +24,8 @@ export class AuthService {
 
   //Simple create user function
   createUser (email: string, password: string, firstName: string, lastName: string) {
-    console.log("CREATE USER API CALL")
     const authData: AuthData = {email: email, password: password, firstname: firstName, lastname: lastName, roleId: 1, companyId: null };
-    this.http.post("https://localhost:44348/api/User", authData).subscribe(response => {
+    this.http.post(BACKEND_URL + "/User", authData).subscribe(response => {
       //If we succesfully registered our user we redirect to the login page.
       this.router.navigate(['/login'])
       this.toastr.success("Successfully created a user, login to get started.")
@@ -33,13 +35,12 @@ export class AuthService {
   login(email: string, password: string) {
 
 
-    this.http.post<any>("https://localhost:44348/api/User/Authenticate", {email: email, password: password}).subscribe(response => {
+    this.http.post<any>(BACKEND_URL + "/User/Authenticate", {email: email, password: password}).subscribe(response => {
 
       //If we get a user as respond it means login is succesfull
       if(User) {
         //Create a user object
-        const user = new User(response.userID, response.email, response.firstName, response.lastName, response.roleID, response.companyId, response.token)
-        console.log(response)
+        const user = new User(response.userID, response.email, response.firstName, response.lastName, response.roleId, response.companyId, response.token)
         //Set our token
         this.token = response.token;
         this.authUser = user;
@@ -47,9 +48,6 @@ export class AuthService {
         this.user.next(user);
         //Add user to local storage
         localStorage.setItem('user', JSON.stringify(user));
-        // this.authStatusListener.next(true);
-        // this.isAuthenticated = true;
-        // localStorage.setItem('token', token);
         this.router.navigate(['/'])
       }
     })
@@ -67,7 +65,7 @@ export class AuthService {
     this.authUser.roleId = roleId;
 
     //We update the user with the new data
-    this.http.put("https://localhost:44348/api/User/" + this.user.value.userID, this.authUser).subscribe(response => {
+    this.http.put(BACKEND_URL + "/User/" + this.user.value.userID, this.authUser).subscribe(response => {
 
       //Broadcast our new changes and overwrite the localstorage user
       this.user.next(this.authUser);
@@ -75,19 +73,24 @@ export class AuthService {
     })
   }
 
+  //Update user function
   updateUser(email: string, firstName: string, lastName: string) {
     this.authUser.email = email;
     this.authUser.firstName = firstName;
     this.authUser.lastName = lastName
-    this.http.put("https://localhost:44348/api/User/" + this.authUser.userID, this.authUser).subscribe(user => {
+    this.http.put(BACKEND_URL + "/User/" + this.authUser.userID, this.authUser).subscribe(user => {
       this.user.next(this.authUser)
       localStorage.setItem('user', JSON.stringify(this.authUser))
       this.toastr.success("You've successfully updated your profile!")
-     // this.router.navigate(['/'])
     })
   }
 
+  //Function to get the token of the user
   getToken () {
+    const user: User = JSON.parse(localStorage.getItem('user'))
+    if(user) {
+      this.token = user._token;
+    }
     return this.token;
   }
 

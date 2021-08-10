@@ -8,7 +8,9 @@ import { Group } from "../models/group.model";
 import { GroupUser } from "../models/groupUser.model";
 import { User } from "../models/user.model";
 import { ToastrService } from 'ngx-toastr';
+import { environment } from "../../environments/environment";
 
+const BACKEND_URL = environment.apiUrl;
 
 
 @Injectable({providedIn: "root"})
@@ -40,8 +42,8 @@ export class GroupService {
 
   getGroups() {
     const user: User = JSON.parse(localStorage.getItem('user'))
-    if(user.companyId) {
-      this.http.get<any>("https://localhost:44348/api/Group/company/" + user.companyId)
+    if(user?.companyId) {
+      this.http.get<any>(BACKEND_URL + "/Group/company/" + user.companyId)
       //I want to change the data bit so we call the pipe function
       .pipe(
         //We want to transform the data so we first call a map function
@@ -68,8 +70,9 @@ export class GroupService {
     }
   }
 
+  //Call to get specific grou of user
   getGroupUser(user: User, groupId: number) {
-    this.http.get<any>("https://localhost:44348/api/GroupUser/group/user/" + user.userID + "/" + groupId).pipe(map(response => {
+    this.http.get<any>(BACKEND_URL + "/GroupUser/group/user/" + user.userID + "/" + groupId).pipe(map(response => {
       if(response) {
         return {
           groupUserId: response.groupUserId,
@@ -90,13 +93,14 @@ export class GroupService {
     })
   }
 
+  //Create a group, with formData because of the picture
   createGroup (group: any, companyId: number) {
     const groupData = new FormData();
     groupData.append("name", group.name)
     groupData.append("themeColor", group.color)
     groupData.append("imagepath", group.imagePath)
     groupData.append("companyId", companyId.toString())
-    this.http.post<any>("https://localhost:44348/api/Group", groupData).subscribe(
+    this.http.post<any>(BACKEND_URL + "/Group", groupData).subscribe(
       response => {
         this.group = response;
         const updatedGroups = this.groups;
@@ -107,9 +111,10 @@ export class GroupService {
     )
   }
 
+  //Delete a group
   deleteGroup (group: Group) {
     const groupId = group.groupId;
-    return this.http.delete("https://localhost:44348/api/Group/" + groupId).subscribe(response => {
+    return this.http.delete(BACKEND_URL + "/Group/" + groupId).subscribe(response => {
       const updatedGroups = this.groups.filter(group => group.groupId !== groupId);
       this.groups = updatedGroups;
       this.groupsUpdated.next([...this.groups]);
@@ -118,15 +123,15 @@ export class GroupService {
 
   }
 
+  //Update a group
   updateGroup(oldGroup: Group, group: any) {
-    console.log(oldGroup)
     const groupData = new FormData();
     groupData.append('groupId', oldGroup.groupId.toString())
     groupData.append('name', group.name)
     groupData.append('themeColor', group.color)
     groupData.append('imagePath', group.imagePath)
     groupData.append('companyId', oldGroup.companyId.toString())
-    this.http.put<any>("https://localhost:44348/api/Group/" + oldGroup.groupId, groupData).subscribe(response => {
+    this.http.put<any>(BACKEND_URL + "/Group/" + oldGroup.groupId, groupData).subscribe(response => {
       const updatedGroups = [...this.groups];
       const oldGroupIndex = updatedGroups.findIndex(g => g.groupId === response.groupId);
       console.log(oldGroupIndex)
@@ -137,13 +142,14 @@ export class GroupService {
     })
   }
 
+  //Add a user to a group
   addUserToGroup(groupUser: GroupUser, groupId: number) {
     groupUser.groupUserId = null;
     groupUser.groupModerator = false;
     groupUser.moderatorRequest = false;
     groupUser.groupRequest = false;
 
-    return this.http.post<any>("https://localhost:44348/api/GroupUser/",
+    return this.http.post<any>(BACKEND_URL + "/GroupUser/",
     {
       moderator: groupUser.groupModerator,
       requestedModerator: groupUser.moderatorRequest,
@@ -154,21 +160,21 @@ export class GroupService {
     })
   }
 
+  //Get a specific group
   getGroup(groupId: Number) {
 
-    this.http.get<any>("https://localhost:44348/api/Group/" + groupId).subscribe(response => {
+    this.http.get<any>(BACKEND_URL + "/Group/" + groupId).subscribe(response => {
       this.group = response;
       this.groupUpdated.next(this.group);
     }
     )
+  }
 
-}
-
-
+  //Add a group request which is a post to groupUser table
   addRequestToGroup(group: Group) {
 
     const user: User = JSON.parse(localStorage.getItem('user'))
-    this.http.post<any>("https://localhost:44348/api/GroupUser/",
+    this.http.post<any>(BACKEND_URL + "/GroupUser/",
     {
       moderator: false,
       requestedModerator: false,
@@ -200,11 +206,12 @@ export class GroupService {
     })
   }
 
+  //Delete an user from a group
   deleteGroupUser(groupUserId: number) {
-    return this.http.delete("https://localhost:44348/api/GroupUser/" + groupUserId)
+    return this.http.delete(BACKEND_URL + "/GroupUser/" + groupUserId)
   }
 
-
+  //Update a user in a group. Depending on what variables are send.
   updateGroupUser(groupUser: GroupUser, moderator: boolean = false, groupId: number, moderatorRequest: boolean = false) {
       if(moderator) {
         groupUser.groupModerator = true;
@@ -219,7 +226,7 @@ export class GroupService {
         }
       }
 
-    return this.http.put("https://localhost:44348/api/GroupUser/" + groupUser.groupUserId, {
+    return this.http.put(BACKEND_URL + "/GroupUser/" + groupUser.groupUserId, {
       GroupUserId: groupUser.groupUserId,
       moderator: groupUser.groupModerator,
       requestedModerator: groupUser.moderatorRequest,
@@ -230,6 +237,7 @@ export class GroupService {
     });
   }
 
+  //Get all users from a group.
   getGroupUsers(groupId: number, pageSize: number, currentPage: number, selectedValue: string, filter: string) {
     let nonMembers: boolean = false;
     let moderator: boolean = false;
@@ -252,9 +260,8 @@ export class GroupService {
         break;
     }
 
-
     this.user = JSON.parse(localStorage.getItem('user'))
-    this.http.get<any>("https://localhost:44348/api/GroupUser/" + groupId + "/" + this.user.companyId,
+    this.http.get<any>(BACKEND_URL + "/GroupUser/" + groupId + "/" + this.user.companyId,
     {params:
       {
         pageSize: pageSize,
@@ -267,6 +274,9 @@ export class GroupService {
       }})
       .pipe(
       map (response => {
+        //We have two different maps here. One is for the users in a group
+        //Other is for nonmembers, these don't have a groupUser record in the database so we map them to a groupUser model
+        //I do this so we can iterate the same way over our lists
         const responseUsers =
        response.users.map(response => {
          if(nonMembers) {
@@ -317,42 +327,44 @@ export class GroupService {
     )
   }
 
+  //Used to let the group edit component know which group to edit
   sendSelectedItem(group: Group) {
     this.selectedItem.next(group)
   }
 
+  //Get all groups from an user.
   getUserGroups() {
     const user: User = JSON.parse(localStorage.getItem('user'))
-    this.http.get<any>("https://localhost:44348/api/GroupUser/user/" + user.userID).pipe(
-      map (response => {
-        return response.map(response => {
-          return {
-            groupUserId: response.groupUserId,
-            groupModerator: response.moderator,
-            moderatorRequest: response.requestedModerator,
-            groupRequest: response.groupRequest,
-            userId: response.userId,
-            user: user,
-            group: {
-              groupId: response.group.groupId,
-              name: response.group.name,
-              themeColor: response.group.themeColor,
-              imagePath: response.group.imagePath,
-              companyId: response.group.companyId
+    if(user){
+      this.http.get<any>(BACKEND_URL + "/GroupUser/user/" + user.userID).pipe(
+        map (response => {
+          return response.map(response => {
+            return {
+              groupUserId: response.groupUserId,
+              groupModerator: response.moderator,
+              moderatorRequest: response.requestedModerator,
+              groupRequest: response.groupRequest,
+              userId: response.userId,
+              user: user,
+              group: {
+                groupId: response.group.groupId,
+                name: response.group.name,
+                themeColor: response.group.themeColor,
+                imagePath: response.group.imagePath,
+                companyId: response.group.companyId
+              }
             }
           }
+          )
         }
-        )
-      }
-    )
-    ).subscribe(response => {
-      this.groupsFromUser = response;
-      this.groupsFromUserUpdated.next(this.groupsFromUser)
+      )
+      ).subscribe(response => {
+        this.groupsFromUser = response;
+        this.groupsFromUserUpdated.next(this.groupsFromUser)
+      })
+    }
 
-    })
   }
-
-
 
 
 }

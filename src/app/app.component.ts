@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 import { User } from './models/user.model';
+import { ErrorService } from './error/error.service';
 
 @Component({
   selector: 'app-root',
@@ -9,22 +10,21 @@ import { User } from './models/user.model';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'company-social-media';
-  constructor(private authService: AuthService){}
+  title = 'CSM Group';
+  constructor(private authService: AuthService, private errorService: ErrorService){}
   user: User = null;
   userSubscription: Subscription;
-
+  errorSubscription: Subscription;
+  errorMessage: boolean = false;
   ngOnInit() {
     //Since this is the first component to load we check if the user is authenticated
     this.authService.checkIfAuthenticated();
-    //Not sure if I need this
-    this.userSubscription = this.authService.user.subscribe(user => {
-      this.user = user;
-    })
+
+
   }
 
   ngOnDestroy() {
-    this.userSubscription.unsubscribe();
+    this.errorSubscription.unsubscribe();
   }
 
 
