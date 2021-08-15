@@ -134,7 +134,6 @@ export class GroupService {
     this.http.put<any>(BACKEND_URL + "/Group/" + oldGroup.groupId, groupData).subscribe(response => {
       const updatedGroups = [...this.groups];
       const oldGroupIndex = updatedGroups.findIndex(g => g.groupId === response.groupId);
-      console.log(oldGroupIndex)
       updatedGroups[oldGroupIndex] = response;
       this.groups = updatedGroups;
       this.groupsUpdated.next([...this.groups]);

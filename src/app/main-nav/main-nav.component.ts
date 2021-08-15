@@ -55,6 +55,7 @@ export class MainNavComponent implements OnInit, OnDestroy{
           if(this.user.roleId !== 3 && this.user.roleId !== 4) {
             this.userGroupSub = this.groupService.groupsFromUserUpdated.subscribe(groups => {
               this.userGroups = groups;
+              this.userGroups = this.userGroups.filter(x => x.groupRequest == false);
               if (groups.some(e => e.groupModerator === true)) {
                 this.moderator = true;
               }

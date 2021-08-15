@@ -117,7 +117,6 @@ export class GroupDetailComponent implements OnInit, OnDestroy{
 
     if(this.filter.length == 0) {
       this.filter = ""
-      console.log("this is the length: " + this.filter.length)
       this.groupService.getGroupUsers(this.groupId, this.usersPerPage, this.currentPage, this.selected, this.filter);
 
     }

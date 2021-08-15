@@ -34,7 +34,6 @@ export class CompanyCreateComponent implements OnInit, OnDestroy{
         this.form.value.color = this.color;
         this.form.value.backgroundColor = this.backgroundColor;
         if(this.mode == "edit") {
-          console.log("we are here")
           this.companyService.updateCompany(this.form.value, this.company.id);
         } else {
           this.companyService.createCompany(this.form.value);

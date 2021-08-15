@@ -88,10 +88,18 @@ export class PostListComponent implements OnInit, OnDestroy {
       this.groupUser = this.groupUsers.find(x => x.group.groupId === this.groupId);
 
       //If users doesn't pass this check he isn't allowed to be here.
-      if(this.user.roleId !== 4 && this.user.roleId !==3 && !this.groupUser) {
+      if(this.user.roleId !== 4 && this.user.roleId !==3) {
+        if(!this.groupUser){
         this.router.navigate(['/company/home'])
-        this.toastr.error("Sorry access denied, send a request to watch the posts of group")
+        this.toastr.error("Sorry access denied, send a request to watch the posts of group!")
+      } else {
+        if(this.groupUser.groupRequest == true) {
+          this.router.navigate(['/company/home'])
+          this.toastr.error("Sorry access denied, request isn't approved yet!")
+        }
       }
+    }
+
 
       //So here we set up a route subscription, we do this so when only the variable at the end of our route changes
       //It doesn't reinitialize the group
